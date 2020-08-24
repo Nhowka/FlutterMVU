@@ -4,8 +4,7 @@ import 'package:todoapp/todo/messaging/todos_messenger.dart';
 import 'package:todoapp/todo/model/todo_item_model.dart';
 import 'package:todoapp/todo/model/todo_model.dart';
 
-class TodoItemMessenger
-    extends MappedMessenger<TodoModel, TodoMsg, TodoItem, TodoItemMsg> {
+class TodoItemMessenger extends MappedMessenger<TodoModel, TodoItem> {
   TodoItemMessenger(TodoMessenger original, int id)
       : super(original, mapToChild(id), merge(id));
 
@@ -22,92 +21,32 @@ class TodoItemMessenger
           });
 
   // Implements the message with behaviour to queue a delete items by id
-  void queueDelete() => dispatcher(QueueDeleteItem());
+  void queueDelete() => dispatcher((TodoItem model) => Update(model,
+      commands: Cmd.ofCancelableModelMsg(
+          (cancel) => (TodoItem model) =>
+              model.rebuild((b) => b.isDeleted = Optional.of(cancel)),
+          Future.delayed(Duration(seconds: 4), () => (TodoItem model) => null),
+          (TodoItem model) =>
+              model.rebuild((ib) => ib.isDeleted = Optional.empty()))));
 
   // Implements the message with behaviour to cancel an item deletion
-  void undoDelete() => dispatcher(UndoDeleteItem());
+  void undoDelete() => dispatcher((TodoItem model) => Update(model,
+      commands: Cmd.ofAction(() => model.isDeleted.ifPresent((c) => c()))));
 
   // Implements the message with behaviour to change the completion state of the item
-  void toggleComplete() => dispatcher(ToggleComplete());
+  void toggleComplete() => modelDispatcher(
+      (model) => model.rebuild((ib) => ib.completed = !ib.completed));
 
   // Implements the message with behaviour to start editing an item
-  void startEdit() => dispatcher(StartEdit());
+  void startEdit() =>
+      modelDispatcher((model) => model.rebuild((ib) => ib.isEditing = true));
 
   // Implements the message with behaviour to finish editing and setting the item's content
-  void setContent(String content) => dispatcher(SetContent(content));
+  void setContent(String content) =>
+      modelDispatcher((TodoItem model) => model.rebuild((ib) => ib
+        ..isEditing = false
+        ..content = content));
 
   @override
   void reset() {}
-}
-
-abstract class TodoItemMsg extends BehaviorMsg<TodoItem, TodoItemMsg> {}
-
-class SetSearch extends TodoMsg {
-  final String content;
-
-  SetSearch(this.content);
-
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) =>
-      Update(model.rebuild((b) => b.search = content));
-}
-
-class QueueDeleteItem extends TodoItemMsg {
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) => Update(model,
-      commands: Cmd.ofCancelableMsg(
-          (cancel) => _AddCancellation(cancel),
-          Future.delayed(Duration(seconds: 4), () => _DeleteItem()),
-          _CancelledDeleteItem()));
-}
-
-class _AddCancellation extends TodoItemMsg {
-  final void Function() cancel;
-
-  _AddCancellation(this.cancel);
-
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) =>
-      Update(model.rebuild((b) => b.isDeleted = Optional.of(cancel)));
-}
-
-class UndoDeleteItem extends TodoItemMsg {
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) => Update(model,
-      commands: Cmd.ofAction(() => model.isDeleted.ifPresent((c) => c())));
-}
-
-class _CancelledDeleteItem extends TodoItemMsg {
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) =>
-      Update(model.rebuild((ib) => ib.isDeleted = Optional.empty()));
-}
-
-class _DeleteItem extends TodoItemMsg {
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) => Update(null);
-}
-
-class StartEdit extends TodoItemMsg {
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) =>
-      Update(model.rebuild((ib) => ib.isEditing = true));
-}
-
-class ToggleComplete extends TodoItemMsg {
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) =>
-      Update(model.rebuild((ib) => ib.completed = !ib.completed));
-}
-
-class SetContent extends TodoItemMsg {
-  final String content;
-
-  SetContent(this.content);
-
-  @override
-  Update<TodoItem, TodoItemMsg> runNext(TodoItem model) =>
-      Update(model.rebuild((ib) => ib
-        ..isEditing = false
-        ..content = content));
 }

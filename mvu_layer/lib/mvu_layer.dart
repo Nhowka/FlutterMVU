@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:async/async.dart';
 
 import 'package:flutter/widgets.dart';
-import 'package:collection/collection.dart';
 
 part 'msg_builder.dart';
 part 'msg_connector.dart';

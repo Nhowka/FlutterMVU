@@ -6,18 +6,8 @@ import 'package:todoapp/todo/service/load_todos_service.dart';
 import 'package:todoapp/todo/model/todo_item_model.dart';
 import 'package:todoapp/todo/model/todo_model.dart';
 
-// Defines the message input and outputs
-abstract class TodoMsg extends BehaviorMsg<TodoModel, TodoMsg> {}
-
-class WrapperTodoItemMsg
-    extends MappedMsg<TodoModel, TodoMsg, TodoItem, TodoItemMsg> {
-  WrapperTodoItemMsg(int id, TodoItemMsg msg)
-      : super(
-            TodoItemMessenger.mapToChild(id), TodoItemMessenger.merge(id), msg);
-}
-
 class TodoMessenger
-    extends MappedMessenger<AllModel, AllMsg, TodoModel, TodoMsg> {
+    extends MappedMessenger<AllModel, TodoModel> {
   final LoadTodoService _service;
 
   TodoMessenger(this._service, AllMessenger parent)
@@ -28,46 +18,24 @@ class TodoMessenger
   static AllModel merge(AllModel m, TodoModel cm) =>
       m.rebuild((b) => b.todos = cm.toBuilder());
 
-  static Update<TodoModel, TodoMsg> init(LoadTodoService service) =>
-      Update(TodoModel(), commands: Cmd.ofMsg(LoadExternalTodos(service)));
+  static Update<TodoModel> init(LoadTodoService service) =>
+      Update(TodoModel(),
+          commands: Cmd.ofFunctionUpdate((TodoModel model) => Update(
+                model.rebuild((b) => b.loadingExternal = true),
+                commands: Cmd.ofAsyncFunc(service.loadTodos,
+                    onSuccessModel: (model, loadedItems) {
+                      final maxId = loadedItems.last.id;
+                      return model.rebuild((b) => b
+                        ..items.addAll(loadedItems)
+                        ..nextId = maxId + 1
+                        ..loadingExternal = false);
+                    },
+                    onErrorModel: (model, ex) =>
+                        model.rebuild((b) => b.loadingExternal = false)),
+              )));
 
   // Implements the message with behaviour to add a new to do item
-  void addTodo(String content) => dispatcher(AddTodo(content));
-
-  // Implements the message with behaviour to set a text filter
-  void setSearch(String content) => dispatcher(SetSearch(content));
-
-  // Implements the message with behaviour to set a filter
-  void setFilter(Filter filter) => dispatcher(SetFilter(filter));
-
-  // Implements the message with behaviour to delete items by the filter
-  void clearByFilter(Filter filter) => dispatcher(ClearByFilter(filter));
-
-  TodoItemMessenger itemMessenger(int id) => TodoItemMessenger(this, id);
-
-  @override
-  void reset() {
-    dispatcher(ResetMsg(init(_service)));
-  }
-}
-
-class SetSearch extends TodoMsg {
-  final String content;
-
-  SetSearch(this.content);
-
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) =>
-      Update(model.rebuild((b) => b.search = content));
-}
-
-class AddTodo extends TodoMsg {
-  final String content;
-
-  AddTodo(this.content);
-
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) => Update(
+  void addTodo(String content) => modelDispatcher((model) =>
       content == null || content.trim().length == 0 || model.loadingExternal
           ? model
           : model.rebuild((b) => b
@@ -77,71 +45,35 @@ class AddTodo extends TodoMsg {
                 TodoItem((i) => i
                   ..content = content
                   ..id = model.nextId))));
-}
 
-class SetFilter extends TodoMsg {
-  final Filter filter;
+  // Implements the message with behaviour to set a text filter
+  void setSearch(String content) =>
+      modelDispatcher((model) => model.rebuild((b) => b.search = content));
 
-  SetFilter(this.filter);
+  // Implements the message with behaviour to set a filter
+  void setFilter(Filter filter) =>
+      modelDispatcher((model) => model.rebuild((b) => b.filter = filter));
 
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) =>
-      Update(model.rebuild((b) => b.filter = filter));
-}
+  // Implements the message with behaviour to delete items by the filter
+  void clearByFilter(Filter filter) =>
+      modelDispatcher((model) => model.rebuild((b) {
+            switch (filter) {
+              case Filter.ALL:
+                b.items.clear();
+                break;
+              case Filter.COMPLETED:
+                b.items.removeWhere((i) => i.completed);
+                break;
+              case Filter.NOT_COMPLETED:
+                b.items.removeWhere((i) => !i.completed);
+            }
+          }));
 
-class ClearByFilter extends TodoMsg {
-  final Filter filter;
-
-  ClearByFilter(this.filter);
-
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) =>
-      Update(model.rebuild((b) {
-        switch (filter) {
-          case Filter.ALL:
-            b.items.clear();
-            break;
-          case Filter.COMPLETED:
-            b.items.removeWhere((i) => i.completed);
-            break;
-          case Filter.NOT_COMPLETED:
-            b.items.removeWhere((i) => !i.completed);
-        }
-      }));
-}
-
-// Implements the message that loads external todos
-class LoadExternalTodos extends TodoMsg {
-  final LoadTodoService service;
-
-  LoadExternalTodos(this.service);
+  TodoItemMessenger itemMessenger(int id) => TodoItemMessenger(this, id);
 
   @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) => Update(
-        model.rebuild((b) => b.loadingExternal = true),
-        commands: Cmd.ofAsyncFunc(service.loadTodos,
-            onSuccess: (items) => _LoadSuccess(items),
-            onError: (ex) => _LoadFailed()),
-      );
-}
-
-class _LoadSuccess extends TodoMsg {
-  final Iterable<TodoItem> loadedItems;
-
-  _LoadSuccess(this.loadedItems);
-
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) {
-    final maxId = loadedItems.last.id;
-    return Update(model.rebuild((b) => b
-      ..items.addAll(loadedItems)
-      ..nextId = maxId + 1
-      ..loadingExternal = false));
+  void reset() {
+    dispatcher((_) => init(_service));
   }
 }
 
-class _LoadFailed extends TodoMsg {
-  @override
-  Update<TodoModel, TodoMsg> runNext(TodoModel model) =>
-      Update(model.rebuild((b) => b.loadingExternal = false));
-}

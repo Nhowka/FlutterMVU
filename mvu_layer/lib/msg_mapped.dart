@@ -2,43 +2,16 @@ part of 'mvu_layer.dart';
 
 typedef ToChild<Model, ChildModel> = ChildModel Function(Model);
 typedef Merger<Model, ChildModel> = Model Function(Model, ChildModel);
-typedef Wrapper<Model, Msg extends BehaviorMsg<Model, Msg>> = Msg Function(
-    BehaviorMsg<Model, Msg>);
-
-// Helper class to create mapped messages that can be used to create
-// sub-messages from a parent model to a child one, supporting a
-// fractal modelling where all parts look the same
-class MappedMsg<Model, Msg extends BehaviorMsg<Model, Msg>, ChildModel,
-        ChildMsg extends BehaviorMsg<ChildModel, ChildMsg>>
-    extends BehaviorMsg<Model, Msg> {
-  final ToChild<Model, ChildModel> mapToChild;
-  final Merger<Model, ChildModel> merge;
-  final ChildMsg msg;
-  MappedMsg(this.mapToChild, this.merge, this.msg);
-
-  Update<Model, Msg> runNext(Model model) {
-    ChildModel childModel = mapToChild(model);
-    Update<ChildModel, ChildMsg> childUpdate = msg.runNext(childModel);
-    return Update(merge(model, childUpdate.model),
-        doRebuild: childUpdate.doRebuild,
-        commands: Cmd.fmap(
-            (BehaviorMsg<ChildModel, ChildMsg> cmsg) =>
-                MappedMsg<Model, Msg, ChildModel, ChildMsg>(
-                    mapToChild, merge, cmsg),
-            childUpdate.commands));
-  }
-}
 
 // Helper messenger to create child-messengers. They operate on a
 // subset of the original model, so you can do simpler messages
 // that represent the transitions of a single widget.
-abstract class MappedMessenger<Model, Msg extends BehaviorMsg<Model, Msg>,
-        ChildModel, ChildMsg extends BehaviorMsg<ChildModel, ChildMsg>>
-    implements Messenger<ChildModel, ChildMsg> {
-  final Messenger<Model, Msg> original;
+abstract class MappedMessenger<Model, ChildModel>
+    implements Messenger<ChildModel> {
+  final Messenger<Model> original;
   StreamController<ChildModel> _childStream;
   StreamSubscription<Model> _childSubscription;
-  Dispatch<ChildModel, BehaviorMsg<ChildModel, ChildMsg>> _dispatch;
+  Dispatch<ChildModel> _dispatch;
   ChildModel _firstModel;
 
   MappedMessenger(this.original, ToChild<Model, ChildModel> mapToChild,
@@ -64,9 +37,15 @@ abstract class MappedMessenger<Model, Msg extends BehaviorMsg<Model, Msg>,
       }
     });
 
-    _dispatch = (BehaviorMsg<ChildModel, ChildMsg> childMsg) {
-      Dispatch<Model, BehaviorMsg<Model, Msg>> dispatch = original.dispatcher;
-      dispatch(MappedMsg(_safeMapToChild, merge, childMsg));
+    _dispatch = (BehaviorMsg<ChildModel> childMsg) {
+      Dispatch<Model> dispatch = original.dispatcher;
+      dispatch((Model model) {
+        ChildModel childModel = mapToChild(model);
+        Update<ChildModel> childUpdate = childMsg(childModel);
+        return Update<Model>(merge(model, childUpdate.model),
+            doRebuild: childUpdate.doRebuild,
+            commands: Cmd.fmap(mapToChild, merge, childUpdate.commands));
+      });
     };
   }
 
@@ -85,9 +64,12 @@ abstract class MappedMessenger<Model, Msg extends BehaviorMsg<Model, Msg>,
   Stream<ChildModel> get changes => _childStream.stream;
 
   @override
-  Dispatch<ChildModel, BehaviorMsg<ChildModel, ChildMsg>> get dispatcher =>
-      _dispatch;
+  Dispatch<ChildModel> get dispatcher => _dispatch;
 
   @override
   ChildModel get firstModel => _firstModel;
+
+  // Dispatch a message that just returns the new model from the old model
+  void modelDispatcher(ChildModel Function(ChildModel) msg) =>
+      dispatcher(fromModelMsg(msg));
 }

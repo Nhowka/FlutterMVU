@@ -4,19 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mvu_layer/mvu_layer.dart';
 
-abstract class TestMsg extends BehaviorMsg<int, TestMsg> {}
-
-class Increment extends TestMsg {
-  @override
-  Update<int, TestMsg> runNext(int model) {
-    return Update(model + 1);
-  }
-}
-
-class TestMessenger extends Messenger<int, TestMsg> {
+class TestMessenger extends Messenger<int> {
   TestMessenger() : super(Update(0));
 
-  void increment() => dispatcher(Increment());
+  void increment() => modelDispatcher((model) => model + 1);
 }
 
 const ButtonKey = ValueKey("Button");
@@ -25,9 +16,9 @@ class TestWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => WidgetsApp(
       color: Colors.black,
-      builder: (_, __) => MsgProvider<int, TestMsg>(
+      builder: (_, __) => MsgProvider<int>(
           messenger: TestMessenger(),
-          child: MsgConnector<TestMessenger, int, TestMsg>(
+          child: MsgConnector<TestMessenger, int>(
               builder: (ctx, msg, model) => Column(children: [
                     Text("$model"),
                     FlatButton(

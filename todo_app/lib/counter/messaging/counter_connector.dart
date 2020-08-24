@@ -4,7 +4,7 @@ import 'package:todoapp/counter/model/counter_model.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
 class CounterConnector
-    extends MsgConnector<CounterMessenger, CounterModel, CounterMsg> {
+    extends MsgConnector<CounterMessenger, CounterModel> {
   CounterConnector(
       {Key key, MsgWidgetBuilder<CounterModel, CounterMessenger> builder})
       : super(key: key, builder: builder);

@@ -6,10 +6,10 @@ import 'package:todoapp/todo/model/todo_item_model.dart';
 
 class LoadTodoService {
   Future<BuiltList<TodoItem>> loadTodos() async {
-    var response =
+    final response =
         await http.get('https://jsonplaceholder.typicode.com/users/1/todos');
-    var jsonBody = response.body;
-    var parsed = jsonDecode(jsonBody);
+    final jsonBody = response.body;
+    final parsed = jsonDecode(jsonBody);
     return BuiltList<TodoItem>(
       parsed.map((e) => TodoItem.fromJson(e as Map<String, dynamic>)).toList(),
     );

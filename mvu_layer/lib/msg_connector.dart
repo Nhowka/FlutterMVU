@@ -1,7 +1,7 @@
 part of 'mvu_layer.dart';
 
-class MsgConnector<Connector extends Messenger<Model, Msg>, Model,
-    Msg extends BehaviorMsg<Model, Msg>> extends StatefulWidget {
+class MsgConnector<Connector extends Messenger<Model>, Model>
+    extends StatefulWidget {
   const MsgConnector({
     Key key,
     @required this.builder,
@@ -15,19 +15,17 @@ class MsgConnector<Connector extends Messenger<Model, Msg>, Model,
   final VoidCallback onDispose;
 
   Connector getMessenger(BuildContext context) =>
-      MsgProvider.of<Model, Msg>(context);
+      MsgProvider.of<Model>(context);
 
-  Widget build(BuildContext context) => MsgBuilder<Connector, Model, Msg>(
+  Widget build(BuildContext context) => MsgBuilder<Connector, Model>(
       messenger: getMessenger(context), builder: builder);
 
   @override
-  _MsgConnectorState createState() =>
-      _MsgConnectorState<Connector, Model, Msg>();
+  _MsgConnectorState createState() => _MsgConnectorState<Connector, Model>();
 }
 
-class _MsgConnectorState<Connector extends Messenger<Model, Msg>, Model,
-        Msg extends BehaviorMsg<Model, Msg>>
-    extends State<MsgConnector<Connector, Model, Msg>> {
+class _MsgConnectorState<Connector extends Messenger<Model>, Model>
+    extends State<MsgConnector<Connector, Model>> {
   @override
   void initState() {
     super.initState();

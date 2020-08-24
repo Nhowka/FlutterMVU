@@ -18,7 +18,7 @@ main() {
 
   setUp(() async {
     _service = MockTodoService();
-    var completer = Completer();
+    final completer = Completer();
     _amsg = AllMessenger(_service);
     _msg = _amsg.todoMessenger
       ..changes.listen((model) {
@@ -27,7 +27,7 @@ main() {
           completer.complete(null);
         }
       });
-    var _ = await completer.future;
+    final _ = await completer.future;
   });
 
   group('Todo messenger Test', () {

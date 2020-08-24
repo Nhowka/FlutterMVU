@@ -3,9 +3,8 @@ part of 'mvu_layer.dart';
 typedef MsgWidgetBuilder<Model, MsgConnector> = Widget Function(
     BuildContext, MsgConnector, Model);
 
-class MsgBuilder<T extends Messenger<Model, Msg>, Model,
-    Msg extends BehaviorMsg<Model, Msg>> extends StatefulWidget {
-  final Messenger<Model, Msg> _messenger;
+class MsgBuilder<T extends Messenger<Model>, Model> extends StatefulWidget {
+  final Messenger<Model> _messenger;
   final MsgWidgetBuilder<Model, T> _builder;
 
   const MsgBuilder({messenger, builder})
@@ -13,14 +12,13 @@ class MsgBuilder<T extends Messenger<Model, Msg>, Model,
         _messenger = messenger;
 
   @override
-  _MsgBuilderState<T, Model, Msg> createState() => _MsgBuilderState(_messenger);
+  _MsgBuilderState<T, Model> createState() => _MsgBuilderState(_messenger);
 }
 
-class _MsgBuilderState<T extends Messenger<Model, Msg>, Model,
-        Msg extends BehaviorMsg<Model, Msg>>
-    extends State<MsgBuilder<T, Model, Msg>> {
+class _MsgBuilderState<T extends Messenger<Model>, Model>
+    extends State<MsgBuilder<T, Model>> {
   StreamSubscription<Model> _changesSub;
-  Messenger<Model, Msg> _messenger;
+  Messenger<Model> _messenger;
   Model _latestModel;
 
   _MsgBuilderState(this._messenger) {

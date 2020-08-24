@@ -19,11 +19,8 @@ class TodoFilter extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return TodoConnector(
-      builder: (context, messenger, model) {
-        var action = filterAction(messenger);
-        return Padding(
+  Widget build(BuildContext context) => TodoConnector(
+        builder: (context, messenger, model) => Padding(
           padding: EdgeInsets.all(4),
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -38,12 +35,10 @@ class TodoFilter extends StatelessWidget {
                               ? Colors.blue
                               : Colors.black),
                     ),
-                    onPressed: () => action(e),
+                    onPressed: () => filterAction(messenger)(e),
                   )),
             ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
 }

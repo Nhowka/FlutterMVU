@@ -1,24 +1,25 @@
 part of 'mvu_layer.dart';
 
-typedef MessengerCreator<Model, Msg extends BehaviorMsg<Model, Msg>>
-    = Messenger<Model, Msg> Function(MsgProcessor<Model, Msg>);
+typedef MessengerCreator<Model> = Messenger<Model> Function(
+    MsgProcessor<Model>);
 
 typedef ChildCreator<
-        ChildMessenger extends Messenger<ChildModel, ChildMsg>,
+        ChildMessenger extends Messenger<ChildModel>,
         ChildModel,
-        ChildMsg extends BehaviorMsg<ChildModel, ChildMsg>,
-        ParentMessenger extends Messenger<Model, Msg>,
+        ChildMsg extends BehaviorMsg<ChildModel>,
+        ParentMessenger extends Messenger<Model>,
         Model,
-        Msg extends BehaviorMsg<Model, Msg>>
+        Msg extends BehaviorMsg<Model>>
     = ChildMessenger Function(ParentMessenger);
 
-abstract class Messenger<Model, Msg extends BehaviorMsg<Model, Msg>> {
-  Dispatch<Model, BehaviorMsg<Model, Msg>> get dispatcher => _dispatcher;
-  Dispatch<Model, BehaviorMsg<Model, Msg>> _dispatcher;
+abstract class Messenger<Model> {
+  // Dispatch a message created using a function
+  Dispatch<Model> get dispatcher => _dispatcher;
+  Dispatch<Model> _dispatcher;
   Stream<Model> _changes;
   Stream<Model> get changes => _changes;
   Model get firstModel => _processor._currentModel;
-  MsgProcessor<Model, Msg> _processor;
+  MsgProcessor<Model> _processor;
   List<Messenger> _dependents = [];
 
   void addDependent(Messenger dependent) {
@@ -26,13 +27,13 @@ abstract class Messenger<Model, Msg extends BehaviorMsg<Model, Msg>> {
   }
 
   void reset() {
-    for (var dependent in _dependents) {
+    for (final dependent in _dependents) {
       dependent.reset();
     }
     _processor.reInit();
   }
 
-  Messenger(Update<Model, Msg> init) {
+  Messenger(Update<Model> init) {
     _processor = MsgProcessor(init);
     _dispatcher = _processor.post;
     _changes = _processor.changes.stream;
@@ -41,25 +42,24 @@ abstract class Messenger<Model, Msg extends BehaviorMsg<Model, Msg>> {
   void dispose() {
     _processor.dispose();
   }
+
+  // Dispatch a message that just returns the new model from the old model
+  void modelDispatcher(Model Function(Model) msg) =>
+      dispatcher(fromModelMsg(msg));
 }
 
-
-class MsgProvider<Model, Msg extends BehaviorMsg<Model, Msg>>
-    extends StatefulWidget {
-  final Messenger<Model, Msg> messenger;
+class MsgProvider<Model> extends StatefulWidget {
+  final Messenger<Model> messenger;
   final List<Type> dependsOn;
   final Widget child;
 
-  static Messenger<Model, Msg> of<Model, Msg extends BehaviorMsg<Model, Msg>>(
-          BuildContext context) =>
-      context
-          .dependOnInheritedWidgetOfExactType<
-              _InheritedMsgProvider<Model, Msg>>()
-          .messenger;
+  static Messenger<Model> of<Model>(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<_InheritedMsgProvider<Model>>()
+      .messenger;
 
   MsgProvider({this.messenger, this.child, this.dependsOn = const [], Key key})
       : super(key: key);
-  MsgProvider<Model, Msg> copyWith({Widget child}) => MsgProvider(
+  MsgProvider<Model> copyWith({Widget child}) => MsgProvider(
         messenger: messenger,
         child: child ?? this.child,
         dependsOn: dependsOn,
@@ -67,14 +67,13 @@ class MsgProvider<Model, Msg extends BehaviorMsg<Model, Msg>>
       );
 
   @override
-  _MsgProviderDisposer createState() => _MsgProviderDisposer<Model, Msg>();
+  _MsgProviderDisposer createState() => _MsgProviderDisposer<Model>();
 }
 
-class _MsgProviderDisposer<Model, Msg extends BehaviorMsg<Model, Msg>>
-    extends State<MsgProvider<Model, Msg>> {
+class _MsgProviderDisposer<Model> extends State<MsgProvider<Model>> {
   @override
   Widget build(BuildContext context) =>
-      _InheritedMsgProvider<Model, Msg>(widget.messenger, widget.child);
+      _InheritedMsgProvider<Model>(widget.messenger, widget.child);
 
   @override
   void dispose() {
@@ -83,9 +82,8 @@ class _MsgProviderDisposer<Model, Msg extends BehaviorMsg<Model, Msg>>
   }
 }
 
-class _InheritedMsgProvider<Model, Msg extends BehaviorMsg<Model, Msg>>
-    extends InheritedWidget {
-  final Messenger<Model, Msg> messenger;
+class _InheritedMsgProvider<Model> extends InheritedWidget {
+  final Messenger<Model> messenger;
 
   _InheritedMsgProvider(this.messenger, child) : super(child: child);
 
@@ -110,7 +108,7 @@ class MsgProviderTree extends StatelessWidget {
     Map<Type, List<Messenger>> dependencies = {};
     Widget child = this.child;
     for (MsgProvider provider in providers.reversed) {
-      for (var type in provider.dependsOn) {
+      for (final type in provider.dependsOn) {
         dependencies[type] = (dependencies[type] ?? [])
           ..add(provider.messenger);
       }

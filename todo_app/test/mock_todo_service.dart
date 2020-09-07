@@ -1,6 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:todoapp/todo/service/load_todos_service.dart';
-import 'package:todoapp/todo/model/todo_item_model.dart';
+import 'package:todoapp/todo/todo_item_model.dart';
 
 class MockTodoService implements LoadTodoService {
   @override

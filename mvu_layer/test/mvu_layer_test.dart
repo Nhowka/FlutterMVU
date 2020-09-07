@@ -16,16 +16,15 @@ class TestWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => WidgetsApp(
       color: Colors.black,
-      builder: (_, __) => MsgProvider<int>(
+      builder: (_, __) => MsgBuilder<TestMessenger, int>(
           messenger: TestMessenger(),
-          child: MsgConnector<TestMessenger, int>(
-              builder: (ctx, msg, model) => Column(children: [
+          builder: (ctx, msg, model) => Column(children: [
                     Text("$model"),
                     FlatButton(
                         key: ButtonKey,
                         child: Text("Increment"),
                         onPressed: () => msg.increment())
-                  ]))));
+                  ])));
 }
 
 void main() {

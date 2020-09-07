@@ -1,6 +1,6 @@
-import 'package:todoapp/all/messaging/all_messenger.dart';
-import 'package:todoapp/all/model/all_model.dart';
-import 'package:todoapp/counter/model/counter_model.dart';
+import 'package:todoapp/all/all_messenger.dart';
+import 'package:todoapp/all/all_model.dart';
+import 'package:todoapp/counter/counter_model.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
 class CounterMessenger extends MappedMessenger<AllModel, CounterModel> {
@@ -18,7 +18,7 @@ class CounterMessenger extends MappedMessenger<AllModel, CounterModel> {
 
   void incrementDelayed() => dispatcher((CounterModel model) => Update(
       model.rebuild((b) => b.valueFuture += 1),
-      commands: Cmd.ofAsyncModelMsg(Future.delayed(
+      commands: Cmd.ofModelMsg(Future.delayed(
           Duration(seconds: 5),
           () => (CounterModel model) => model.rebuild((b) => b.valueFuture == 0
               ? b

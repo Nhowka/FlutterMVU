@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/counter/messaging/counter_provider.dart';
+import 'package:todoapp/all/all_messenger.dart';
 import 'package:todoapp/todo/service/load_todos_service.dart';
-import 'package:todoapp/todo/messaging/todos_provider.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
-import 'all/messaging/all_provider.dart';
-import 'all/view/all_widget.dart';
+import 'all/all_model.dart';
+import 'all/all_widget.dart';
 
 void main() => runApp(TodoApp(service: LoadTodoService()));
 
@@ -24,14 +23,8 @@ class TodoApp extends StatelessWidget {
         home: Scaffold(
             appBar:
                 AppBar(backgroundColor: Colors.lightGreen, title: Text("=)")),
-            body: MsgProviderTree(
-              providers: () {
-                final all = AllProvider(service: _service);
-                final todo = TodoProvider(messenger: all.messenger);
-                final counter = CounterProvider(messenger: all.messenger);
-                return <MsgProvider>[all, todo, counter];
-              }(),
-              child: AllWidget(),
-            )));
+            body: MsgBuilder<AllMessenger, AllModel>(
+                messenger: AllMessenger(_service),
+                builder: AllWidget.builder)));
   }
 }

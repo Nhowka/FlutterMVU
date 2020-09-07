@@ -1,7 +1,7 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:todoapp/counter/model/counter_model.dart';
-import 'package:todoapp/todo/model/todo_model.dart';
+import 'package:todoapp/counter/counter_model.dart';
+import 'package:todoapp/todo/todo_model.dart';
 
 part 'all_model.g.dart';
 

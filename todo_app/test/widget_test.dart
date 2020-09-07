@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:todoapp/all/model/all_model.dart';
+import 'package:todoapp/all/all_model.dart';
 import 'package:todoapp/main.dart';
 
 import 'mock_todo_service.dart';

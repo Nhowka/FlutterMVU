@@ -1,8 +1,8 @@
 import 'package:optional/optional_internal.dart';
 import 'package:mvu_layer/mvu_layer.dart';
-import 'package:todoapp/todo/messaging/todos_messenger.dart';
-import 'package:todoapp/todo/model/todo_item_model.dart';
-import 'package:todoapp/todo/model/todo_model.dart';
+import 'package:todoapp/todo/todos_messenger.dart';
+import 'package:todoapp/todo/todo_item_model.dart';
+import 'package:todoapp/todo/todo_model.dart';
 
 class TodoItemMessenger extends MappedMessenger<TodoModel, TodoItem> {
   TodoItemMessenger(TodoMessenger original, int id)

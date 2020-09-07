@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:todoapp/all/messaging/all_messenger.dart';
-import 'package:todoapp/todo/messaging/todos_messenger.dart';
+import 'package:todoapp/all/all_messenger.dart';
+import 'package:todoapp/todo/todos_messenger.dart';
 import 'package:todoapp/todo/service/load_todos_service.dart';
-import 'package:todoapp/todo/model/todo_item_model.dart';
-import 'package:todoapp/todo/model/todo_model.dart';
+import 'package:todoapp/todo/todo_item_model.dart';
+import 'package:todoapp/todo/todo_model.dart';
 
 import 'mock_todo_service.dart';
 

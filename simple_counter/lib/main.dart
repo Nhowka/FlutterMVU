@@ -32,8 +32,8 @@ class HomeModel {
 class HomeMessenger extends Messenger<HomeModel> {
   HomeMessenger(title) : super(Update(HomeModel(title: title, counter: 0)));
 
-  void increment() => modelDispatcher(
-      (model) => model.copyWith(counter: model.counter + 1));
+  void increment() =>
+      modelDispatcher((model) => model.copyWith(counter: model.counter + 1));
 }
 
 Widget homeBuilder(context, HomeMessenger messenger, HomeModel model) {

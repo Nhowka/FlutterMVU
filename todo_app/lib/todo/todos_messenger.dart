@@ -1,10 +1,10 @@
-import 'package:todoapp/all/messaging/all_messenger.dart';
-import 'package:todoapp/all/model/all_model.dart';
+import 'package:todoapp/all/all_messenger.dart';
+import 'package:todoapp/all/all_model.dart';
 import 'package:mvu_layer/mvu_layer.dart';
-import 'package:todoapp/todo/messaging/todo_item_messenger.dart';
+import 'package:todoapp/todo/todo_item_messenger.dart';
 import 'package:todoapp/todo/service/load_todos_service.dart';
-import 'package:todoapp/todo/model/todo_item_model.dart';
-import 'package:todoapp/todo/model/todo_model.dart';
+import 'package:todoapp/todo/todo_item_model.dart';
+import 'package:todoapp/todo/todo_model.dart';
 
 class TodoMessenger
     extends MappedMessenger<AllModel, TodoModel> {
@@ -22,7 +22,7 @@ class TodoMessenger
       Update(TodoModel(),
           commands: Cmd.ofFunctionUpdate((TodoModel model) => Update(
                 model.rebuild((b) => b.loadingExternal = true),
-                commands: Cmd.ofAsyncFunc(service.loadTodos,
+                commands: Cmd.ofFunc(service.loadTodos,
                     onSuccessModel: (model, loadedItems) {
                       final maxId = loadedItems.last.id;
                       return model.rebuild((b) => b

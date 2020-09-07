@@ -1,7 +1,7 @@
-import 'package:todoapp/all/model/all_model.dart';
-import 'package:todoapp/counter/messaging/counter_messenger.dart';
+import 'package:todoapp/all/all_model.dart';
+import 'package:todoapp/counter/counter_messenger.dart';
 import 'package:mvu_layer/mvu_layer.dart';
-import 'package:todoapp/todo/messaging/todos_messenger.dart';
+import 'package:todoapp/todo/todos_messenger.dart';
 import 'package:todoapp/todo/service/load_todos_service.dart';
 
 class AllMessenger extends Messenger<AllModel> {

@@ -201,11 +201,12 @@ class Cmd<Model> {
 
 // Defines the return of the new model with optional commands
 class Update<Model> {
-  const Update(this.model,
-      {this.commands = const Cmd.none(), this.doRebuild = true});
   final Cmd<Model> commands;
   final bool doRebuild;
   final Model model;
+
+  const Update(this.model,
+      {this.commands = const Cmd.none(), this.doRebuild = true});
 }
 
 class MsgProcessor<Model> {

@@ -6,8 +6,7 @@ import 'package:todoapp/todo/service/load_todos_service.dart';
 import 'package:todoapp/todo/todo_item_model.dart';
 import 'package:todoapp/todo/todo_model.dart';
 
-class TodoMessenger
-    extends MappedMessenger<AllModel, TodoModel> {
+class TodoMessenger extends MappedMessenger<AllModel, TodoModel> {
   final LoadTodoService _service;
 
   TodoMessenger(this._service, AllMessenger parent)
@@ -18,21 +17,19 @@ class TodoMessenger
   static AllModel merge(AllModel m, TodoModel cm) =>
       m.rebuild((b) => b.todos = cm.toBuilder());
 
-  static Update<TodoModel> init(LoadTodoService service) =>
-      Update(TodoModel(),
-          commands: Cmd.ofFunctionUpdate((TodoModel model) => Update(
-                model.rebuild((b) => b.loadingExternal = true),
-                commands: Cmd.ofFunc(service.loadTodos,
-                    onSuccessModel: (model, loadedItems) {
-                      final maxId = loadedItems.last.id;
-                      return model.rebuild((b) => b
-                        ..items.addAll(loadedItems)
-                        ..nextId = maxId + 1
-                        ..loadingExternal = false);
-                    },
-                    onErrorModel: (model, ex) =>
-                        model.rebuild((b) => b.loadingExternal = false)),
-              )));
+  static Update<TodoModel> init(LoadTodoService service) => Update(
+        TodoModel((b) => b.loadingExternal = true),
+        commands: Cmd.ofFunc(service.loadTodos,
+            onSuccessModel: (model, loadedItems) {
+              final maxId = loadedItems.last.id;
+              return model.rebuild((b) => b
+                ..items.addAll(loadedItems)
+                ..nextId = maxId + 1
+                ..loadingExternal = false);
+            },
+            onErrorModel: (model, ex) =>
+                model.rebuild((b) => b.loadingExternal = false)),
+      );
 
   // Implements the message with behaviour to add a new to do item
   void addTodo(String content) => modelDispatcher((model) =>
@@ -76,4 +73,3 @@ class TodoMessenger
     dispatcher((_) => init(_service));
   }
 }
-

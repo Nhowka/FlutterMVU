@@ -36,7 +36,7 @@ class HomeMessenger extends Messenger<HomeModel> {
       modelDispatcher((model) => model.copyWith(counter: model.counter + 1));
 }
 
-Widget homeBuilder(context, HomeMessenger messenger, HomeModel model) {
+Widget homeBuilder(BuildContext context, HomeMessenger messenger, HomeModel model) {
   return Scaffold(
     appBar: AppBar(
       title: Text(model.title),

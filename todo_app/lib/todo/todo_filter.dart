@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:todoapp/todo/todos_messenger.dart';
 import 'package:todoapp/todo/todo_model.dart';
 
 class TodoFilter {

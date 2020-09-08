@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:mvu_layer/mvu_layer.dart';
 import 'package:todoapp/todo/todo_filter.dart';
-import 'package:todoapp/todo/todo_item_messenger.dart';
-import 'package:todoapp/todo/todo_item_model.dart';
 import 'package:todoapp/todo/todo_item_widget.dart';
 import 'package:todoapp/todo/todo_model.dart';
 import 'package:todoapp/todo/todos_messenger.dart';

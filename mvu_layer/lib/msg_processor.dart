@@ -8,6 +8,7 @@ FutureOr<BehaviorMsg<Model>> fromModelMsg<Model>(Model fn(Model model)) =>
 
 /// Alias for a function that takes a message and returns void
 typedef Dispatch<Model> = void Function(BehaviorMsg<Model>);
+
 /// Alias for a function that takes a dispatcher and returns void
 typedef Sub<Model> = void Function(Dispatch<Model> dispatch);
 
@@ -17,15 +18,18 @@ class Cmd<Model> {
   final List<Sub<Model>> _commands;
 
   const Cmd(List<Sub<Model>> base) : this._commands = base;
+
   /// Creates a new Cmd from a function returning Update
   Cmd.ofFunctionUpdate(BehaviorMsg<Model> msg)
       : this([(Dispatch<Model> dispatch) => dispatch(msg)]);
+
   /// Creates a new Cmd from a function returning Model
   Cmd.ofFunctionModel(Model msg(Model model))
       : this([(Dispatch<Model> dispatch) => dispatch(fromModelMsg(msg))]);
 
   /// Creates a new Cmd from a Sub
   Cmd.ofSub(Sub<Model> sub) : this([sub]);
+
   /// Creates an empty Cmd
   const Cmd.none() : this(const []);
 
@@ -119,7 +123,8 @@ class Cmd<Model> {
         if (onSuccessUpdate != null) {
           dispatch((model) => onSuccessUpdate(model, result));
         } else if (onSuccessModel != null) {
-          dispatch(await fromModelMsg((model) => onSuccessModel(model, result)));
+          dispatch(
+              await fromModelMsg((model) => onSuccessModel(model, result)));
         }
       } on Exception catch (e) {
         if (onErrorUpdate != null) {
@@ -179,8 +184,7 @@ class Cmd<Model> {
 
   /// Takes an async model Msg. Optionally takes a function to
   /// dispatch a message if awaiting the Msg fails
-  static Cmd<Model> ofModelMsg<Model>(
-      FutureOr<Model Function(Model)> asyncMsg,
+  static Cmd<Model> ofModelMsg<Model>(FutureOr<Model Function(Model)> asyncMsg,
       {FutureOr<BehaviorMsg<Model>> onError(Exception e)}) {
     return Cmd.ofSub((dispatch) async {
       try {
@@ -211,7 +215,8 @@ class Update<Model> {
 
 class MsgProcessor<Model> {
   Model _currentModel;
-  final StreamController<FutureOr<BehaviorMsg<Model>>> _mainLoop = StreamController();
+  final StreamController<FutureOr<BehaviorMsg<Model>>> _mainLoop =
+      StreamController();
   final StreamController<Model> changes = StreamController.broadcast();
   StreamSubscription<Future<Update<Model>>> _appLoopSub;
 
@@ -230,17 +235,18 @@ class MsgProcessor<Model> {
 
   MsgProcessor(this.init) {
     var newModel = init.model;
+
     /// Filters only valid message and model pairs to the stream
-    final mainLoopStream = _mainLoop.stream
-        .map((FutureOr<BehaviorMsg<Model>> msg) async {
-           final func = await msg;
-           return (func != null && _currentModel != null) ? func(newModel) : null;
-    })
-        .where((x) => x != null);
+    final mainLoopStream =
+        _mainLoop.stream.map((FutureOr<BehaviorMsg<Model>> msg) async {
+      final func = await msg;
+      return (func != null && _currentModel != null) ? func(newModel) : null;
+    }).where((x) => x != null);
     _currentModel = newModel;
 
     _appLoopSub = mainLoopStream.listen((update) async {
       final updates = await update;
+
       /// Sets the state again on each new message
       newModel = updates.model;
       if (updates.doRebuild && !changes.isClosed) {

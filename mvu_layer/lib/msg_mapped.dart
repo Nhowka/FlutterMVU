@@ -64,6 +64,7 @@ abstract class MappedMessenger<Model, ChildModel>
   Stream<ChildModel> get changes => _childStream.stream;
 
   @override
+
   /// Dispatch a message created using a function
   Dispatch<ChildModel> get dispatcher => _dispatch;
 

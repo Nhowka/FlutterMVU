@@ -1,3 +1,8 @@
-## [0.1.0] - Initial release
+# 0.1.1
 
-* Small but probably sufficient API surface.
+- Follow dartfmt conventions and better package description.
+
+# 0.1.0 
+
+- Initial release
+- Small but probably sufficient API surface.

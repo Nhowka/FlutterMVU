@@ -3,6 +3,8 @@ part of 'mvu_layer.dart';
 typedef MsgWidgetBuilder<Model, MsgConnector> = Widget Function(
     BuildContext, MsgConnector, Model);
 
+/// Stateful widget that uses the messenger state to render the view and the
+/// messenger dispatcher to change it
 class MsgBuilder<T extends Messenger<Model>, Model> extends StatefulWidget {
   final Messenger<Model> _messenger;
   final MsgWidgetBuilder<Model, T> _builder;

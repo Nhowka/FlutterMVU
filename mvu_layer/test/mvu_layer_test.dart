@@ -23,7 +23,7 @@ class TestWidget extends StatelessWidget {
                     FlatButton(
                         key: ButtonKey,
                         child: Text("Increment"),
-                        onPressed: () => msg.increment())
+                        onPressed: msg.increment)
                   ])));
 }
 

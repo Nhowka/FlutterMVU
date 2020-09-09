@@ -3,9 +3,9 @@ part of 'mvu_layer.dart';
 typedef ToChild<Model, ChildModel> = ChildModel Function(Model);
 typedef Merger<Model, ChildModel> = Model Function(Model, ChildModel);
 
-// Helper messenger to create child-messengers. They operate on a
-// subset of the original model, so you can do simpler messages
-// that represent the transitions of a single widget.
+/// Helper messenger to create child-messengers. They operate on a
+/// subset of the original model, so you can do simpler messages
+/// that represent the transitions of a single widget.
 abstract class MappedMessenger<Model, ChildModel>
     implements Messenger<ChildModel> {
   final Messenger<Model> original;
@@ -64,12 +64,13 @@ abstract class MappedMessenger<Model, ChildModel>
   Stream<ChildModel> get changes => _childStream.stream;
 
   @override
+  /// Dispatch a message created using a function
   Dispatch<ChildModel> get dispatcher => _dispatch;
 
   @override
   ChildModel get firstModel => _firstModel;
 
-  // Dispatch a message that just returns the new model from the old model
+  /// Dispatch a message that just returns the new model from the old model
   void modelDispatcher(ChildModel Function(ChildModel) msg) =>
       dispatcher(fromModelMsg(msg));
 }

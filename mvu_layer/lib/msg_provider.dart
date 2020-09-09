@@ -13,7 +13,7 @@ typedef ChildCreator<
     = ChildMessenger Function(ParentMessenger);
 
 abstract class Messenger<Model> {
-  // Dispatch a message created using a function
+  /// Dispatch a message created using a function
   Dispatch<Model> get dispatcher => _dispatcher;
   Dispatch<Model> _dispatcher;
   Stream<Model> _changes;
@@ -43,11 +43,13 @@ abstract class Messenger<Model> {
     _processor.dispose();
   }
 
-  // Dispatch a message that just returns the new model from the old model
+  /// Dispatch a message that just returns the new model from the old model
   void modelDispatcher(Model Function(Model) msg) =>
       dispatcher(fromModelMsg(msg));
 }
 
+/// Creates a way to pass a [Messenger] along the widget tree to be consumed
+/// by a child [MsgConnector]
 class MsgProvider<Model> extends StatefulWidget {
   final Messenger<Model> messenger;
   final List<Type> dependsOn;
@@ -91,6 +93,7 @@ class _InheritedMsgProvider<Model> extends InheritedWidget {
   bool updateShouldNotify(InheritedWidget oldWidget) => false;
 }
 
+/// Creates a tree with all providers
 class MsgProviderTree extends StatelessWidget {
   const MsgProviderTree({
     Key key,

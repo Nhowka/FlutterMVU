@@ -1,5 +1,6 @@
 part of 'mvu_layer.dart';
 
+/// Use a [Messenger] from a [MsgProvider] up the widget tree
 class MsgConnector<Connector extends Messenger<Model>, Model>
     extends StatefulWidget {
   const MsgConnector({

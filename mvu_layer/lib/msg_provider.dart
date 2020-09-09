@@ -12,6 +12,8 @@ typedef ChildCreator<
         Msg extends BehaviorMsg<Model>>
     = ChildMessenger Function(ParentMessenger);
 
+/// Class where the transitions are hold. Used with [MsgBuilder] do render
+/// the current state
 abstract class Messenger<Model> {
   /// Dispatch a message created using a function
   Dispatch<Model> get dispatcher => _dispatcher;
@@ -33,6 +35,7 @@ abstract class Messenger<Model> {
     _processor.reInit();
   }
 
+  /// Initial state of the Messenger
   Messenger(Update<Model> init) {
     _processor = MsgProcessor(init);
     _dispatcher = _processor.post;

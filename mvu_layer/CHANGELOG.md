@@ -1,3 +1,7 @@
+# 0.1.2
+
+- Use sync dispatching for preventing race conditions or dead-locks
+
 # 0.1.1
 
 - Follow dartfmt conventions and better package description.

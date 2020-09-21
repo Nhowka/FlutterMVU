@@ -1,3 +1,7 @@
+# 0.1.4
+
+- Only call `setState` when `mounted`
+
 # 0.1.3
 
 - Downgrade `async` to better compatibility

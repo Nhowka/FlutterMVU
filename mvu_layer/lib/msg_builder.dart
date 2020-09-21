@@ -8,10 +8,15 @@ typedef MsgWidgetBuilder<Model, MsgConnector> = Widget Function(
 class MsgBuilder<T extends Messenger<Model>, Model> extends StatefulWidget {
   final Messenger<Model> _messenger;
   final MsgWidgetBuilder<Model, T> _builder;
+  final ValueChanged<BuildContext> _onInit;
 
-  const MsgBuilder({messenger, builder})
+  const MsgBuilder(
+      {Messenger<Model> messenger,
+      MsgWidgetBuilder<Model, T> builder,
+      ValueChanged<BuildContext> onInit})
       : _builder = builder,
-        _messenger = messenger;
+        _messenger = messenger,
+        _onInit = onInit;
 
   @override
   _MsgBuilderState<T, Model> createState() => _MsgBuilderState(_messenger);
@@ -31,6 +36,12 @@ class _MsgBuilderState<T extends Messenger<Model>, Model>
           _latestModel = model;
         });
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget._onInit?.call(context);
   }
 
   @override

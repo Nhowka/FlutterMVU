@@ -1,3 +1,7 @@
+# 0.1.5
+
+- Support `onInit` function for using the `BuildContext` when initialising
+
 # 0.1.4
 
 - Only call `setState` when `mounted`

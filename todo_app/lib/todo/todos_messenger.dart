@@ -52,19 +52,22 @@ class TodoMessenger extends MappedMessenger<AllModel, TodoModel> {
       modelDispatcher((model) => model.rebuild((b) => b.filter = filter));
 
   // Implements the message with behaviour to delete items by the filter
-  void clearByFilter(Filter filter) =>
-      modelDispatcher((model) => model.rebuild((b) {
-            switch (filter) {
-              case Filter.ALL:
-                b.items.clear();
-                break;
-              case Filter.COMPLETED:
-                b.items.removeWhere((i) => i.completed);
-                break;
-              case Filter.NOT_COMPLETED:
-                b.items.removeWhere((i) => !i.completed);
-            }
-          }));
+  void clearByFilter(Filter filter) {
+    doWithModel((model) {
+      model.items
+          .where((item) {
+            if (filter == Filter.COMPLETED)
+              return item.completed;
+            else if (filter == Filter.NOT_COMPLETED)
+              return !item.completed;
+            else
+              return true;
+          })
+          .where((item) => item.isDeleted.isEmpty)
+          .forEach(
+              (element) => TodoItemMessenger(this, element.id).queueDelete());
+    });
+  }
 
   TodoItemMessenger itemMessenger(int id) => TodoItemMessenger(this, id);
 

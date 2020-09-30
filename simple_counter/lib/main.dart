@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
@@ -29,14 +31,29 @@ class HomeModel {
       HomeModel(title: title ?? this.title, counter: counter ?? this.counter);
 }
 
+void autoCounter(Function(BehaviorMsg<HomeModel>) dispatch) {
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    dispatch((model) {
+      if (model.counter > 30) timer.cancel();
+
+      return Update(model.counter > 0
+          ? model.copyWith(counter: model.counter - 1)
+          : model);
+    });
+  });
+}
+
 class HomeMessenger extends Messenger<HomeModel> {
-  HomeMessenger(title) : super(Update(HomeModel(title: title, counter: 0)));
+  HomeMessenger(title)
+      : super(Update(HomeModel(title: title, counter: 0),
+            commands: Cmd.ofSub(autoCounter)));
 
   void increment() =>
       modelDispatcher((model) => model.copyWith(counter: model.counter + 1));
 }
 
-Widget homeBuilder(BuildContext context, HomeMessenger messenger, HomeModel model) {
+Widget homeBuilder(
+    BuildContext context, HomeMessenger messenger, HomeModel model) {
   return Scaffold(
     appBar: AppBar(
       title: Text(model.title),

@@ -49,7 +49,7 @@ packages:
       name: cupertino_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.3"
+    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -84,10 +84,10 @@ packages:
   mvu_layer:
     dependency: "direct main"
     description:
-      path: "../mvu_layer"
-      relative: true
-    source: path
-    version: "0.0.1"
+      name: mvu_layer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.6"
   path:
     dependency: transitive
     description:

@@ -47,8 +47,11 @@ abstract class Messenger<Model> {
   }
 
   /// Dispatch a message that just returns the new model from the old model
-  void modelDispatcher(Model Function(Model) msg) =>
-      dispatcher(fromModelMsg(msg));
+  void modelDispatcher(Model msg(Model model)) => dispatcher(fromModelMsg(msg));
+
+  /// Uses the latest model to do some computation
+  void doWithModel(FutureOr<void> action(Model model)) => dispatcher((model) =>
+      Update(model, commands: Cmd.ofAction(() async => action(model))));
 }
 
 /// Creates a way to pass a [Messenger] along the widget tree to be consumed

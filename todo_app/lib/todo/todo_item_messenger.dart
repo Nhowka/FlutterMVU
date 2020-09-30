@@ -30,8 +30,8 @@ class TodoItemMessenger extends MappedMessenger<TodoModel, TodoItem> {
               model.rebuild((ib) => ib.isDeleted = Optional.empty()))));
 
   // Implements the message with behaviour to cancel an item deletion
-  void undoDelete() => dispatcher((TodoItem model) => Update(model,
-      commands: Cmd.ofAction(() => model.isDeleted.ifPresent((c) => c()))));
+  void undoDelete() => doWithModel((TodoItem model) =>
+      model.isDeleted.ifPresent((c) => c()));
 
   // Implements the message with behaviour to change the completion state of the item
   void toggleComplete() => modelDispatcher(

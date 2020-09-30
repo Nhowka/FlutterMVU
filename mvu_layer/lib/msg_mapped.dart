@@ -72,6 +72,11 @@ abstract class MappedMessenger<Model, ChildModel>
   ChildModel get firstModel => _firstModel;
 
   /// Dispatch a message that just returns the new model from the old model
-  void modelDispatcher(ChildModel Function(ChildModel) msg) =>
+  void modelDispatcher(ChildModel msg(ChildModel model)) =>
       dispatcher(fromModelMsg(msg));
+
+  /// Uses the latest model to do some computation
+  void doWithModel(FutureOr<void> action(ChildModel model)) =>
+      dispatcher((model) =>
+          Update(model, commands: Cmd.ofAction(() async => action(model))));
 }

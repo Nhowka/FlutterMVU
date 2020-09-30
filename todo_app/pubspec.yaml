@@ -27,8 +27,7 @@ dependencies:
   built_value: ^7.1.0
   built_collection: 4.3.2
   optional: 5.0.0
-  mvu_layer:
-    path: ../mvu_layer
+  mvu_layer: 0.1.6
 
 
 dev_dependencies:

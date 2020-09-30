@@ -1,3 +1,7 @@
+# 0.1.6
+
+- New helper `doWithModel` to do create actions using the latest model
+
 # 0.1.5
 
 - Support `onInit` function for using the `BuildContext` when initialising

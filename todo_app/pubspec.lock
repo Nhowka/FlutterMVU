@@ -294,10 +294,10 @@ packages:
   mvu_layer:
     dependency: "direct main"
     description:
-      path: "../mvu_layer"
-      relative: true
-    source: path
-    version: "0.0.1"
+      name: mvu_layer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.6"
   node_interop:
     dependency: transitive
     description:

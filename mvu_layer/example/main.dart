@@ -30,7 +30,7 @@ class HomeModel {
 }
 
 class HomeMessenger extends Messenger<HomeModel> {
-  HomeMessenger(title) : super(Update(HomeModel(title: title, counter: 0)));
+  HomeMessenger(title) : super.model(HomeModel(title: title, counter: 0));
 
   void increment() =>
       modelDispatcher((model) => model.copyWith(counter: model.counter + 1));

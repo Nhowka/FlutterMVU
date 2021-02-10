@@ -20,7 +20,7 @@ class Cmd<Model> {
   const Cmd(List<Sub<Model>> base) : this._commands = base;
 
   /// Creates a new Cmd from a function returning Update
-  Cmd.ofFunctionUpdate(BehaviorMsg<Model> msg)
+  Cmd.ofFunctionUpdate(Update<Model> msg(Model model))
       : this([(Dispatch<Model> dispatch) => dispatch(msg)]);
 
   /// Creates a new Cmd from a function returning Model
@@ -133,6 +133,24 @@ class Cmd<Model> {
         }
       }
     });
+  }
+
+  /// Perform a function receiving the current model.
+  /// Takes a mapping function to map the result to a Msg.
+  /// Optionally takes a function to dispatch a message on Exception.
+  static Cmd<Model> ofModelFunc<Result, Model>(
+    FutureOr<Result> func(Model model), {
+    Update<Model> onSuccessUpdate(Model model, Result r),
+    Model onSuccessModel(Model model, Result r),
+    Update<Model> onErrorUpdate(Model model, Exception e),
+    Model onErrorModel(Model model, Exception e),
+  }) {
+    return Cmd.ofSub((dispatch) => dispatch((model) => Update(model,
+        commands: Cmd.ofFunc(() => func(model),
+            onErrorUpdate: onErrorUpdate,
+            onSuccessUpdate: onSuccessUpdate,
+            onErrorModel: onErrorModel,
+            onSuccessModel: onSuccessModel))));
   }
 
   /// Creates a cancelable message from a future message that

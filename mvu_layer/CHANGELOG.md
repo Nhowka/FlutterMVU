@@ -1,6 +1,14 @@
+# 0.1.8
+
+- New name constructor `model` initialize the `Messenger` with simple model
+
+# 0.1.7
+
+- New helper `ofModelFunc` to use the latest model as argument of the function
+
 # 0.1.6
 
-- New helper `doWithModel` to do create actions using the latest model
+- New helper `doWithModel` to create actions using the latest model
 
 # 0.1.5
 

@@ -42,6 +42,9 @@ abstract class Messenger<Model> {
     _changes = _processor.changes.stream;
   }
 
+  /// Named initializer for simple model initialization
+  Messenger.model(Model init) : this(Update(init));
+
   void dispose() {
     _processor.dispose();
   }

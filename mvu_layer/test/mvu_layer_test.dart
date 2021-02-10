@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
 class TestMessenger extends Messenger<int> {
-  TestMessenger() : super(Update(0));
+  TestMessenger() : super.model(0);
 
   void increment() => modelDispatcher((model) => model + 1);
 }

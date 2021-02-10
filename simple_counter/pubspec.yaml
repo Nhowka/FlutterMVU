@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  mvu_layer: 0.1.6
+  mvu_layer: 0.1.8
 
 
   # The following adds the Cupertino Icons font to your application.

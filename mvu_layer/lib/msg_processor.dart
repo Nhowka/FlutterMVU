@@ -3,6 +3,7 @@ part of 'mvu_layer.dart';
 /// Defines the behavior of the messages, taking a model and outputting a new
 /// model and optionally extra commands to send future messages
 typedef BehaviorMsg<Model> = Update<Model> Function(Model);
+
 BehaviorMsg<Model> fromModelMsg<Model>(Model fn(Model model)) =>
     (model) => Update(fn(model));
 
@@ -60,8 +61,10 @@ class Cmd<Model> {
     FutureOr<void> action(), {
     Update<Model> onSuccessUpdate(Model model),
     Model onSuccessModel(Model model),
+    Cmd<Model> onSuccessCommands,
     Update<Model> onErrorUpdate(Model model, Exception e),
     Model onErrorModel(Model model, Exception e),
+    Cmd<Model> onErrorCommands(Exception e),
   }) {
     return Cmd.ofSub((Dispatch<Model> dispatch) async {
       try {
@@ -70,12 +73,16 @@ class Cmd<Model> {
           dispatch(onSuccessUpdate);
         } else if (onSuccessModel != null) {
           dispatch(fromModelMsg(onSuccessModel));
+        } else if (onSuccessCommands != null) {
+          dispatch((model) => Update(model, commands: onSuccessCommands));
         }
       } on Exception catch (e) {
         if (onErrorUpdate != null) {
           dispatch((model) => onErrorUpdate(model, e));
         } else if (onErrorModel != null) {
           dispatch(fromModelMsg((model) => onErrorModel(model, e)));
+        } else if (onErrorCommands != null) {
+          dispatch((model) => Update(model, commands: onErrorCommands(e)));
         }
       }
     });
@@ -87,8 +94,10 @@ class Cmd<Model> {
     Future action, {
     Update<Model> onSuccessUpdate(Model model),
     Model onSuccessModel(Model model),
+    Cmd<Model> onSuccessCommands,
     Update<Model> onErrorUpdate(Model model, Exception e),
     Model onErrorModel(Model model, Exception e),
+    Cmd<Model> onErrorCommands(Exception e),
   }) {
     return Cmd.ofSub((dispatch) async {
       try {
@@ -97,12 +106,16 @@ class Cmd<Model> {
           dispatch(onSuccessUpdate);
         } else if (onSuccessModel != null) {
           dispatch(fromModelMsg(onSuccessModel));
+        } else if (onSuccessCommands != null) {
+          dispatch((model) => Update(model, commands: onSuccessCommands));
         }
       } on Exception catch (e) {
         if (onErrorUpdate != null) {
           dispatch((model) => onErrorUpdate(model, e));
         } else if (onErrorModel != null) {
           dispatch(fromModelMsg((model) => onErrorModel(model, e)));
+        } else if (onErrorCommands != null) {
+          dispatch((model) => Update(model, commands: onErrorCommands(e)));
         }
       }
     });
@@ -114,8 +127,10 @@ class Cmd<Model> {
     FutureOr<Result> func(), {
     Update<Model> onSuccessUpdate(Model model, Result r),
     Model onSuccessModel(Model model, Result r),
+    Cmd<Model> onSuccessCommands(Result r),
     Update<Model> onErrorUpdate(Model model, Exception e),
     Model onErrorModel(Model model, Exception e),
+    Cmd<Model> onErrorCommands(Exception e),
   }) {
     return Cmd.ofSub((dispatch) async {
       try {
@@ -124,12 +139,17 @@ class Cmd<Model> {
           dispatch((model) => onSuccessUpdate(model, result));
         } else if (onSuccessModel != null) {
           dispatch(fromModelMsg((model) => onSuccessModel(model, result)));
+        } else if (onSuccessCommands != null) {
+          dispatch(
+              (model) => Update(model, commands: onSuccessCommands(result)));
         }
       } on Exception catch (e) {
         if (onErrorUpdate != null) {
           dispatch((model) => onErrorUpdate(model, e));
         } else if (onErrorModel != null) {
           dispatch(fromModelMsg((model) => onErrorModel(model, e)));
+        } else if (onErrorCommands != null) {
+          dispatch((model) => Update(model, commands: onErrorCommands(e)));
         }
       }
     });
@@ -141,16 +161,22 @@ class Cmd<Model> {
   static Cmd<Model> ofModelFunc<Result, Model>(
     FutureOr<Result> func(Model model), {
     Update<Model> onSuccessUpdate(Model model, Result r),
+    Cmd<Model> onSuccessCommands(Result r),
     Model onSuccessModel(Model model, Result r),
     Update<Model> onErrorUpdate(Model model, Exception e),
     Model onErrorModel(Model model, Exception e),
+    Cmd<Model> onErrorCommands(Exception e),
   }) {
     return Cmd.ofSub((dispatch) => dispatch((model) => Update(model,
-        commands: Cmd.ofFunc(() => func(model),
-            onErrorUpdate: onErrorUpdate,
-            onSuccessUpdate: onSuccessUpdate,
-            onErrorModel: onErrorModel,
-            onSuccessModel: onSuccessModel))));
+        commands: Cmd.ofFunc(
+          () => func(model),
+          onErrorUpdate: onErrorUpdate,
+          onErrorCommands: onErrorCommands,
+          onSuccessUpdate: onSuccessUpdate,
+          onErrorModel: onErrorModel,
+          onSuccessModel: onSuccessModel,
+          onSuccessCommands: onSuccessCommands,
+        ))));
   }
 
   /// Creates a cancelable message from a future message that
@@ -237,6 +263,7 @@ class MsgProcessor<Model> {
   StreamSubscription<Update<Model>> _appLoopSub;
 
   Update<Model> init;
+
   void post(BehaviorMsg<Model> msg) {
     if (!_mainLoop.isClosed) {
       _mainLoop.add(msg);
@@ -270,6 +297,7 @@ class MsgProcessor<Model> {
 
     init.commands._commands.forEach((cmd) => cmd(this.post));
   }
+
   void dispose() {
     _appLoopSub?.cancel();
     changes.close();

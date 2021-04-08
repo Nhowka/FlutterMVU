@@ -75,6 +75,10 @@ abstract class MappedMessenger<Model, ChildModel>
   void modelDispatcher(ChildModel msg(ChildModel model)) =>
       dispatcher(fromModelMsg(msg));
 
+  /// Dispatch a command, reusing the same model
+  void commandDispatcher(Cmd<ChildModel> commands) =>
+      dispatcher((ChildModel model) => Update(model, commands: commands));
+
   /// Uses the latest model to do some computation
   void doWithModel(FutureOr<void> action(ChildModel model)) =>
       dispatcher((model) =>

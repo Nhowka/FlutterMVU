@@ -1,3 +1,7 @@
+# 0.1.9
+
+- Helpers for command only dispatching
+
 # 0.1.8
 
 - New name constructor `model` initialize the `Messenger` with simple model

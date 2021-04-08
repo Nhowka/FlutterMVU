@@ -20,7 +20,7 @@ class TestWidget extends StatelessWidget {
           messenger: TestMessenger(),
           builder: (ctx, msg, model) => Column(children: [
                 Text("$model"),
-                FlatButton(
+                TextButton(
                     key: ButtonKey,
                     child: Text("Increment"),
                     onPressed: msg.increment)
@@ -49,7 +49,7 @@ void main() {
 
     await Future.delayed(Duration(seconds: 4));
     expect(42, msg.firstModel);
-    msg.dispatcher((_) => Update(33));
+    msg.modelDispatcher((_) => 33);
     await Future.delayed(Duration(seconds: 2));
     expect(33, msg.firstModel);
     await Future.delayed(Duration(seconds: 6));

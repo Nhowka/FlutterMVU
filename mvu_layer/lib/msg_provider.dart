@@ -19,7 +19,9 @@ abstract class Messenger<Model> {
   Dispatch<Model> get dispatcher => _dispatcher;
   Dispatch<Model> _dispatcher;
   Stream<Model> _changes;
+
   Stream<Model> get changes => _changes;
+
   Model get firstModel => _processor._currentModel;
   MsgProcessor<Model> _processor;
   List<Messenger> _dependents = [];
@@ -52,6 +54,10 @@ abstract class Messenger<Model> {
   /// Dispatch a message that just returns the new model from the old model
   void modelDispatcher(Model msg(Model model)) => dispatcher(fromModelMsg(msg));
 
+  /// Dispatch a command, reusing the same model
+  void commandDispatcher(Cmd<Model> commands) =>
+      dispatcher((Model model) => Update(model, commands: commands));
+
   /// Uses the latest model to do some computation
   void doWithModel(FutureOr<void> action(Model model)) => dispatcher((model) =>
       Update(model, commands: Cmd.ofAction(() async => action(model))));
@@ -70,6 +76,7 @@ class MsgProvider<Model> extends StatefulWidget {
 
   MsgProvider({this.messenger, this.child, this.dependsOn = const [], Key key})
       : super(key: key);
+
   MsgProvider<Model> copyWith({Widget child}) => MsgProvider(
         messenger: messenger,
         child: child ?? this.child,

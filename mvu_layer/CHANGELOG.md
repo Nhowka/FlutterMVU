@@ -1,3 +1,7 @@
+# 0.1.11
+
+- Extra `MsgBuilder` with `TickerProvider` support
+
 # 0.1.10
 
 - Helpers for command only continuations

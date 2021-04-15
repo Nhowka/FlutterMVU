@@ -24,7 +24,9 @@ class MyApp extends StatelessWidget {
 class HomeModel {
   final String title;
   final int counter;
+
   HomeModel({this.title, this.counter});
+
   HomeModel copyWith({title, counter}) =>
       HomeModel(title: title ?? this.title, counter: counter ?? this.counter);
 }
@@ -36,7 +38,8 @@ class HomeMessenger extends Messenger<HomeModel> {
       modelDispatcher((model) => model.copyWith(counter: model.counter + 1));
 }
 
-Widget homeBuilder(BuildContext context, HomeMessenger messenger, HomeModel model) {
+Widget homeBuilder(
+    BuildContext context, HomeMessenger messenger, HomeModel model) {
   return Scaffold(
     appBar: AppBar(
       title: Text(model.title),

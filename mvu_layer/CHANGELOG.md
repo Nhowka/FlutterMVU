@@ -1,3 +1,7 @@
+# 0.1.12
+
+- Support continuations on `doWithModel`
+
 # 0.1.11
 
 - Extra `MsgBuilder` with `TickerProvider` support

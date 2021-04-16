@@ -59,8 +59,23 @@ abstract class Messenger<Model> {
       dispatcher((Model model) => Update(model, commands: commands));
 
   /// Uses the latest model to do some computation
-  void doWithModel(FutureOr<void> action(Model model)) => dispatcher((model) =>
-      Update(model, commands: Cmd.ofAction(() async => action(model))));
+  void doWithModel(
+    FutureOr<void> action(Model model), {
+    Update<Model> onSuccessUpdate(Model model),
+    Model onSuccessModel(Model model),
+    Cmd<Model> onSuccessCommands,
+    Update<Model> onErrorUpdate(Model model, Exception e),
+    Model onErrorModel(Model model, Exception e),
+    Cmd<Model> onErrorCommands(Exception e),
+  }) =>
+      dispatcher((model) => Update(model,
+          commands: Cmd.ofAction(() async => action(model),
+              onSuccessUpdate: onSuccessUpdate,
+              onSuccessModel: onSuccessModel,
+              onSuccessCommands: onSuccessCommands,
+              onErrorUpdate: onErrorUpdate,
+              onErrorModel: onErrorModel,
+              onErrorCommands: onErrorCommands)));
 }
 
 /// Creates a way to pass a [Messenger] along the widget tree to be consumed

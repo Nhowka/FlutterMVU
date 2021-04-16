@@ -80,7 +80,21 @@ abstract class MappedMessenger<Model, ChildModel>
       dispatcher((ChildModel model) => Update(model, commands: commands));
 
   /// Uses the latest model to do some computation
-  void doWithModel(FutureOr<void> action(ChildModel model)) =>
-      dispatcher((model) =>
-          Update(model, commands: Cmd.ofAction(() async => action(model))));
+  void doWithModel(
+    FutureOr<void> action(ChildModel model), {
+    Update<ChildModel> onSuccessUpdate(ChildModel model),
+    ChildModel onSuccessModel(ChildModel model),
+    Cmd<ChildModel> onSuccessCommands,
+    Update<ChildModel> onErrorUpdate(ChildModel model, Exception e),
+    ChildModel onErrorModel(ChildModel model, Exception e),
+    Cmd<ChildModel> onErrorCommands(Exception e),
+  }) =>
+      dispatcher((model) => Update(model,
+          commands: Cmd.ofAction(() async => action(model),
+              onSuccessUpdate: onSuccessUpdate,
+              onSuccessModel: onSuccessModel,
+              onSuccessCommands: onSuccessCommands,
+              onErrorUpdate: onErrorUpdate,
+              onErrorModel: onErrorModel,
+              onErrorCommands: onErrorCommands)));
 }

@@ -1,3 +1,7 @@
+# 0.1.13
+
+- Simplify `MsgConnector` code
+
 # 0.1.12
 
 - Support continuations on `doWithModel`

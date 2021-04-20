@@ -15,12 +15,6 @@ class MsgConnector<Connector extends Messenger<Model>, Model>
   final VoidCallback onInit;
   final VoidCallback onDispose;
 
-  Connector getMessenger(BuildContext context) =>
-      MsgProvider.of<Model>(context);
-
-  Widget build(BuildContext context) => MsgBuilder<Connector, Model>(
-      messenger: getMessenger(context), builder: builder);
-
   @override
   _MsgConnectorState createState() => _MsgConnectorState<Connector, Model>();
 }
@@ -40,5 +34,6 @@ class _MsgConnectorState<Connector extends Messenger<Model>, Model>
   }
 
   @override
-  Widget build(BuildContext context) => widget.build(context);
+  Widget build(BuildContext context) => MsgBuilder<Connector, Model>(
+      messenger: MsgProvider.of<Model>(context), builder: widget.builder);
 }

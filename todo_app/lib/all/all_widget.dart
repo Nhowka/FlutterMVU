@@ -35,7 +35,7 @@ class AllWidget {
                       .map((e) => DropdownMenuItem(
                             key: ValueKey(e),
                             value: e,
-                            child: Text(_pageNames[e]),
+                            child: Text(_pageNames[e]!),
                           ))
                       .toList(),
                 )

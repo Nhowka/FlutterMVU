@@ -24,7 +24,7 @@ abstract class TodoItem implements Built<TodoItem, TodoItemBuilder> {
   @BuiltValueField(serialize: false)
   Optional<void Function()> get isDeleted;
 
-  static TodoItem fromJson(Map<String, dynamic> json) {
+  static TodoItem? fromJson(Map<String, dynamic> json) {
     return serializers.deserializeWith(TodoItem.serializer, json);
   }
 

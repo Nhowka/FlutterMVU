@@ -15,9 +15,9 @@ class _$TodoItemSerializer implements StructuredSerializer<TodoItem> {
   final String wireName = 'TodoItem';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, TodoItem object,
+  Iterable<Object?> serialize(Serializers serializers, TodoItem object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'completed',
       serializers.serialize(object.completed,
           specifiedType: const FullType(bool)),
@@ -35,7 +35,7 @@ class _$TodoItemSerializer implements StructuredSerializer<TodoItem> {
   }
 
   @override
-  TodoItem deserialize(Serializers serializers, Iterable<Object> serialized,
+  TodoItem deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new TodoItemBuilder();
 
@@ -43,7 +43,7 @@ class _$TodoItemSerializer implements StructuredSerializer<TodoItem> {
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'completed':
           result.completed = serializers.deserialize(value,
@@ -80,27 +80,21 @@ class _$TodoItem extends TodoItem {
   @override
   final Optional<void Function()> isDeleted;
 
-  factory _$TodoItem([void Function(TodoItemBuilder) updates]) =>
+  factory _$TodoItem([void Function(TodoItemBuilder)? updates]) =>
       (new TodoItemBuilder()..update(updates)).build();
 
   _$TodoItem._(
-      {this.completed, this.content, this.id, this.isEditing, this.isDeleted})
+      {required this.completed,
+      required this.content,
+      required this.id,
+      required this.isEditing,
+      required this.isDeleted})
       : super._() {
-    if (completed == null) {
-      throw new BuiltValueNullFieldError('TodoItem', 'completed');
-    }
-    if (content == null) {
-      throw new BuiltValueNullFieldError('TodoItem', 'content');
-    }
-    if (id == null) {
-      throw new BuiltValueNullFieldError('TodoItem', 'id');
-    }
-    if (isEditing == null) {
-      throw new BuiltValueNullFieldError('TodoItem', 'isEditing');
-    }
-    if (isDeleted == null) {
-      throw new BuiltValueNullFieldError('TodoItem', 'isDeleted');
-    }
+    BuiltValueNullFieldError.checkNotNull(completed, 'TodoItem', 'completed');
+    BuiltValueNullFieldError.checkNotNull(content, 'TodoItem', 'content');
+    BuiltValueNullFieldError.checkNotNull(id, 'TodoItem', 'id');
+    BuiltValueNullFieldError.checkNotNull(isEditing, 'TodoItem', 'isEditing');
+    BuiltValueNullFieldError.checkNotNull(isDeleted, 'TodoItem', 'isDeleted');
   }
 
   @override
@@ -143,27 +137,27 @@ class _$TodoItem extends TodoItem {
 }
 
 class TodoItemBuilder implements Builder<TodoItem, TodoItemBuilder> {
-  _$TodoItem _$v;
+  _$TodoItem? _$v;
 
-  bool _completed;
-  bool get completed => _$this._completed;
-  set completed(bool completed) => _$this._completed = completed;
+  bool? _completed;
+  bool? get completed => _$this._completed;
+  set completed(bool? completed) => _$this._completed = completed;
 
-  String _content;
-  String get content => _$this._content;
-  set content(String content) => _$this._content = content;
+  String? _content;
+  String? get content => _$this._content;
+  set content(String? content) => _$this._content = content;
 
-  int _id;
-  int get id => _$this._id;
-  set id(int id) => _$this._id = id;
+  int? _id;
+  int? get id => _$this._id;
+  set id(int? id) => _$this._id = id;
 
-  bool _isEditing;
-  bool get isEditing => _$this._isEditing;
-  set isEditing(bool isEditing) => _$this._isEditing = isEditing;
+  bool? _isEditing;
+  bool? get isEditing => _$this._isEditing;
+  set isEditing(bool? isEditing) => _$this._isEditing = isEditing;
 
-  Optional<void Function()> _isDeleted;
-  Optional<void Function()> get isDeleted => _$this._isDeleted;
-  set isDeleted(Optional<void Function()> isDeleted) =>
+  Optional<void Function()>? _isDeleted;
+  Optional<void Function()>? get isDeleted => _$this._isDeleted;
+  set isDeleted(Optional<void Function()>? isDeleted) =>
       _$this._isDeleted = isDeleted;
 
   TodoItemBuilder() {
@@ -171,12 +165,13 @@ class TodoItemBuilder implements Builder<TodoItem, TodoItemBuilder> {
   }
 
   TodoItemBuilder get _$this {
-    if (_$v != null) {
-      _completed = _$v.completed;
-      _content = _$v.content;
-      _id = _$v.id;
-      _isEditing = _$v.isEditing;
-      _isDeleted = _$v.isDeleted;
+    final $v = _$v;
+    if ($v != null) {
+      _completed = $v.completed;
+      _content = $v.content;
+      _id = $v.id;
+      _isEditing = $v.isEditing;
+      _isDeleted = $v.isDeleted;
       _$v = null;
     }
     return this;
@@ -184,14 +179,12 @@ class TodoItemBuilder implements Builder<TodoItem, TodoItemBuilder> {
 
   @override
   void replace(TodoItem other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$TodoItem;
   }
 
   @override
-  void update(void Function(TodoItemBuilder) updates) {
+  void update(void Function(TodoItemBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -199,11 +192,15 @@ class TodoItemBuilder implements Builder<TodoItem, TodoItemBuilder> {
   _$TodoItem build() {
     final _$result = _$v ??
         new _$TodoItem._(
-            completed: completed,
-            content: content,
-            id: id,
-            isEditing: isEditing,
-            isDeleted: isDeleted);
+            completed: BuiltValueNullFieldError.checkNotNull(
+                completed, 'TodoItem', 'completed'),
+            content: BuiltValueNullFieldError.checkNotNull(
+                content, 'TodoItem', 'content'),
+            id: BuiltValueNullFieldError.checkNotNull(id, 'TodoItem', 'id'),
+            isEditing: BuiltValueNullFieldError.checkNotNull(
+                isEditing, 'TodoItem', 'isEditing'),
+            isDeleted: BuiltValueNullFieldError.checkNotNull(
+                isDeleted, 'TodoItem', 'isDeleted'));
     replace(_$result);
     return _$result;
   }

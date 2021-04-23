@@ -15,9 +15,9 @@ class _$TodoModelSerializer implements StructuredSerializer<TodoModel> {
   final String wireName = 'TodoModel';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, TodoModel object,
+  Iterable<Object?> serialize(Serializers serializers, TodoModel object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'items',
       serializers.serialize(object.items,
           specifiedType:
@@ -39,7 +39,7 @@ class _$TodoModelSerializer implements StructuredSerializer<TodoModel> {
   }
 
   @override
-  TodoModel deserialize(Serializers serializers, Iterable<Object> serialized,
+  TodoModel deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new TodoModelBuilder();
 
@@ -47,12 +47,12 @@ class _$TodoModelSerializer implements StructuredSerializer<TodoModel> {
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'items':
           result.items.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
-                      BuiltList, const [const FullType(TodoItem)]))
+                      BuiltList, const [const FullType(TodoItem)]))!
               as BuiltList<Object>);
           break;
         case 'loadingExternal':
@@ -90,27 +90,22 @@ class _$TodoModel extends TodoModel {
   @override
   final String search;
 
-  factory _$TodoModel([void Function(TodoModelBuilder) updates]) =>
+  factory _$TodoModel([void Function(TodoModelBuilder)? updates]) =>
       (new TodoModelBuilder()..update(updates)).build();
 
   _$TodoModel._(
-      {this.items, this.loadingExternal, this.nextId, this.filter, this.search})
+      {required this.items,
+      required this.loadingExternal,
+      required this.nextId,
+      required this.filter,
+      required this.search})
       : super._() {
-    if (items == null) {
-      throw new BuiltValueNullFieldError('TodoModel', 'items');
-    }
-    if (loadingExternal == null) {
-      throw new BuiltValueNullFieldError('TodoModel', 'loadingExternal');
-    }
-    if (nextId == null) {
-      throw new BuiltValueNullFieldError('TodoModel', 'nextId');
-    }
-    if (filter == null) {
-      throw new BuiltValueNullFieldError('TodoModel', 'filter');
-    }
-    if (search == null) {
-      throw new BuiltValueNullFieldError('TodoModel', 'search');
-    }
+    BuiltValueNullFieldError.checkNotNull(items, 'TodoModel', 'items');
+    BuiltValueNullFieldError.checkNotNull(
+        loadingExternal, 'TodoModel', 'loadingExternal');
+    BuiltValueNullFieldError.checkNotNull(nextId, 'TodoModel', 'nextId');
+    BuiltValueNullFieldError.checkNotNull(filter, 'TodoModel', 'filter');
+    BuiltValueNullFieldError.checkNotNull(search, 'TodoModel', 'search');
   }
 
   @override
@@ -154,41 +149,42 @@ class _$TodoModel extends TodoModel {
 }
 
 class TodoModelBuilder implements Builder<TodoModel, TodoModelBuilder> {
-  _$TodoModel _$v;
+  _$TodoModel? _$v;
 
-  ListBuilder<TodoItem> _items;
+  ListBuilder<TodoItem>? _items;
   ListBuilder<TodoItem> get items =>
       _$this._items ??= new ListBuilder<TodoItem>();
-  set items(ListBuilder<TodoItem> items) => _$this._items = items;
+  set items(ListBuilder<TodoItem>? items) => _$this._items = items;
 
-  bool _loadingExternal;
-  bool get loadingExternal => _$this._loadingExternal;
-  set loadingExternal(bool loadingExternal) =>
+  bool? _loadingExternal;
+  bool? get loadingExternal => _$this._loadingExternal;
+  set loadingExternal(bool? loadingExternal) =>
       _$this._loadingExternal = loadingExternal;
 
-  int _nextId;
-  int get nextId => _$this._nextId;
-  set nextId(int nextId) => _$this._nextId = nextId;
+  int? _nextId;
+  int? get nextId => _$this._nextId;
+  set nextId(int? nextId) => _$this._nextId = nextId;
 
-  Filter _filter;
-  Filter get filter => _$this._filter;
-  set filter(Filter filter) => _$this._filter = filter;
+  Filter? _filter;
+  Filter? get filter => _$this._filter;
+  set filter(Filter? filter) => _$this._filter = filter;
 
-  String _search;
-  String get search => _$this._search;
-  set search(String search) => _$this._search = search;
+  String? _search;
+  String? get search => _$this._search;
+  set search(String? search) => _$this._search = search;
 
   TodoModelBuilder() {
     TodoModel._initializeBuilder(this);
   }
 
   TodoModelBuilder get _$this {
-    if (_$v != null) {
-      _items = _$v.items?.toBuilder();
-      _loadingExternal = _$v.loadingExternal;
-      _nextId = _$v.nextId;
-      _filter = _$v.filter;
-      _search = _$v.search;
+    final $v = _$v;
+    if ($v != null) {
+      _items = $v.items.toBuilder();
+      _loadingExternal = $v.loadingExternal;
+      _nextId = $v.nextId;
+      _filter = $v.filter;
+      _search = $v.search;
       _$v = null;
     }
     return this;
@@ -196,14 +192,12 @@ class TodoModelBuilder implements Builder<TodoModel, TodoModelBuilder> {
 
   @override
   void replace(TodoModel other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$TodoModel;
   }
 
   @override
-  void update(void Function(TodoModelBuilder) updates) {
+  void update(void Function(TodoModelBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -214,12 +208,16 @@ class TodoModelBuilder implements Builder<TodoModel, TodoModelBuilder> {
       _$result = _$v ??
           new _$TodoModel._(
               items: items.build(),
-              loadingExternal: loadingExternal,
-              nextId: nextId,
-              filter: filter,
-              search: search);
+              loadingExternal: BuiltValueNullFieldError.checkNotNull(
+                  loadingExternal, 'TodoModel', 'loadingExternal'),
+              nextId: BuiltValueNullFieldError.checkNotNull(
+                  nextId, 'TodoModel', 'nextId'),
+              filter: BuiltValueNullFieldError.checkNotNull(
+                  filter, 'TodoModel', 'filter'),
+              search: BuiltValueNullFieldError.checkNotNull(
+                  search, 'TodoModel', 'search'));
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'items';
         items.build();

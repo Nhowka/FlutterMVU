@@ -16,9 +16,9 @@ class TodoFilter {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Text(label),
-            ...Filter.values.map((e) => FlatButton(
+            ...Filter.values.map((e) => TextButton(
                   child: Text(
-                    filterNames[e],
+                    filterNames[e]!,
                     style: TextStyle(
                         color: hasHighlight && model.filter == e
                             ? Colors.blue

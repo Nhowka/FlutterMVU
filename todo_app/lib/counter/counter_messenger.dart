@@ -3,7 +3,7 @@ import 'package:todoapp/all/all_model.dart';
 import 'package:todoapp/counter/counter_model.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
-class CounterMessenger extends MappedMessenger<AllModel, CounterModel> {
+class CounterMessenger extends MappedMessenger<AllMessenger, AllModel, CounterModel> {
   CounterMessenger(AllMessenger parent) : super(parent, mapToChild, merge);
 
   static Update<CounterModel> get init => Update(CounterModel());
@@ -14,19 +14,19 @@ class CounterMessenger extends MappedMessenger<AllModel, CounterModel> {
       m.rebuild((b) => b.counter = cm.toBuilder());
 
   void increment() => modelDispatcher(
-      (CounterModel model) => model.rebuild((b) => b.value += 1));
+      (CounterModel model) => model.rebuild((b) => b.value = model.value + 1));
 
   void incrementDelayed() => dispatcher((CounterModel model) => Update(
-      model.rebuild((b) => b.valueFuture += 1),
+      model.rebuild((b) => b.valueFuture = model.valueFuture + 1),
       commands: Cmd.ofModelMsg(Future.delayed(
           Duration(seconds: 5),
           () => (CounterModel model) => model.rebuild((b) => b.valueFuture == 0
               ? b
               : (b
-                ..valueFuture -= 1
-                ..value += 1))))));
+                ..valueFuture = model.valueFuture - 1
+                ..value = model.value + 1))))));
   void decrement() => modelDispatcher(
-      (CounterModel model) => model.rebuild((b) => b.value -= 1));
+      (CounterModel model) => model.rebuild((b) => b.value = model.value - 1));
 
   @override
   void reset() => dispatcher((_) => init);

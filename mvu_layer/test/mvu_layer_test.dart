@@ -45,7 +45,7 @@ void main() {
     msg.dispatcher((_) => Update(42,
         commands: Cmd.ofFunc(
             () => Future.delayed(Duration(seconds: 8), () => 25),
-            onSuccessModel: (_, r) => r)));
+            onSuccessModel: (_, int r) => r)));
 
     await Future.delayed(Duration(seconds: 4));
     expect(42, msg.firstModel);

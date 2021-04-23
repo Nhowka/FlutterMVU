@@ -16,9 +16,9 @@ class _$CounterModelSerializer implements StructuredSerializer<CounterModel> {
   final String wireName = 'CounterModel';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, CounterModel object,
+  Iterable<Object?> serialize(Serializers serializers, CounterModel object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'value',
       serializers.serialize(object.value, specifiedType: const FullType(int)),
       'valueFuture',
@@ -30,7 +30,8 @@ class _$CounterModelSerializer implements StructuredSerializer<CounterModel> {
   }
 
   @override
-  CounterModel deserialize(Serializers serializers, Iterable<Object> serialized,
+  CounterModel deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new CounterModelBuilder();
 
@@ -38,7 +39,7 @@ class _$CounterModelSerializer implements StructuredSerializer<CounterModel> {
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'value':
           result.value = serializers.deserialize(value,
@@ -61,16 +62,14 @@ class _$CounterModel extends CounterModel {
   @override
   final int valueFuture;
 
-  factory _$CounterModel([void Function(CounterModelBuilder) updates]) =>
+  factory _$CounterModel([void Function(CounterModelBuilder)? updates]) =>
       (new CounterModelBuilder()..update(updates)).build();
 
-  _$CounterModel._({this.value, this.valueFuture}) : super._() {
-    if (value == null) {
-      throw new BuiltValueNullFieldError('CounterModel', 'value');
-    }
-    if (valueFuture == null) {
-      throw new BuiltValueNullFieldError('CounterModel', 'valueFuture');
-    }
+  _$CounterModel._({required this.value, required this.valueFuture})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(value, 'CounterModel', 'value');
+    BuiltValueNullFieldError.checkNotNull(
+        valueFuture, 'CounterModel', 'valueFuture');
   }
 
   @override
@@ -104,24 +103,25 @@ class _$CounterModel extends CounterModel {
 
 class CounterModelBuilder
     implements Builder<CounterModel, CounterModelBuilder> {
-  _$CounterModel _$v;
+  _$CounterModel? _$v;
 
-  int _value;
-  int get value => _$this._value;
-  set value(int value) => _$this._value = value;
+  int? _value;
+  int? get value => _$this._value;
+  set value(int? value) => _$this._value = value;
 
-  int _valueFuture;
-  int get valueFuture => _$this._valueFuture;
-  set valueFuture(int valueFuture) => _$this._valueFuture = valueFuture;
+  int? _valueFuture;
+  int? get valueFuture => _$this._valueFuture;
+  set valueFuture(int? valueFuture) => _$this._valueFuture = valueFuture;
 
   CounterModelBuilder() {
     CounterModel._initializeBuilder(this);
   }
 
   CounterModelBuilder get _$this {
-    if (_$v != null) {
-      _value = _$v.value;
-      _valueFuture = _$v.valueFuture;
+    final $v = _$v;
+    if ($v != null) {
+      _value = $v.value;
+      _valueFuture = $v.valueFuture;
       _$v = null;
     }
     return this;
@@ -129,21 +129,23 @@ class CounterModelBuilder
 
   @override
   void replace(CounterModel other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$CounterModel;
   }
 
   @override
-  void update(void Function(CounterModelBuilder) updates) {
+  void update(void Function(CounterModelBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
   _$CounterModel build() {
-    final _$result =
-        _$v ?? new _$CounterModel._(value: value, valueFuture: valueFuture);
+    final _$result = _$v ??
+        new _$CounterModel._(
+            value: BuiltValueNullFieldError.checkNotNull(
+                value, 'CounterModel', 'value'),
+            valueFuture: BuiltValueNullFieldError.checkNotNull(
+                valueFuture, 'CounterModel', 'valueFuture'));
     replace(_$result);
     return _$result;
   }

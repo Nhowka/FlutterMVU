@@ -25,7 +25,7 @@ class HomeModel {
   final String title;
   final int counter;
 
-  HomeModel({this.title, this.counter});
+  HomeModel({required this.title, required this.counter});
 
   HomeModel copyWith({title, counter}) =>
       HomeModel(title: title ?? this.title, counter: counter ?? this.counter);

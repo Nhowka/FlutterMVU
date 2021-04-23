@@ -32,7 +32,7 @@ abstract class TodoModel implements Built<TodoModel, TodoModelBuilder> {
           ? items
           : (this.filter == Filter.COMPLETED ? completed : notCompleted))
       .where((todo) =>
-          todo.content.toLowerCase().contains(search?.toLowerCase() ?? ''))
+          todo.content.toLowerCase().contains(search.toLowerCase()))
       .toBuiltList();
 
   TodoModel._();

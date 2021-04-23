@@ -25,6 +25,6 @@ class AllMessenger extends Messenger<AllModel> {
 
   CounterMessenger get counterMessenger => new CounterMessenger(this);
   TodoMessenger get todoMessenger => new TodoMessenger(_todoService, this);
-  void changePage(Pages page) =>
+  void changePage(Pages? page) =>
       modelDispatcher((model) => model.rebuild((b) => b.page = page));
 }

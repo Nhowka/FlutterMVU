@@ -6,27 +6,20 @@ typedef Merger<Model, ChildModel> = Model Function(Model, ChildModel);
 /// Helper messenger to create child-messengers. They operate on a
 /// subset of the original model, so you can do simpler messages
 /// that represent the transitions of a single widget.
-abstract class MappedMessenger<Model, ChildModel>
+abstract class MappedMessenger<T extends Messenger<Model>, Model, ChildModel>
     implements Messenger<ChildModel> {
-  final Messenger<Model> original;
-  StreamController<ChildModel> _childStream;
-  StreamSubscription<Model> _childSubscription;
-  Dispatch<ChildModel> _dispatch;
-  ChildModel _firstModel;
+  final T original;
+  final StreamController<ChildModel> _childStream =
+      StreamController.broadcast();
+  late final StreamSubscription<Model> _childSubscription;
+  late final Dispatch<ChildModel> _dispatch;
+  late ChildModel _firstModel;
 
   MappedMessenger(this.original, ToChild<Model, ChildModel> mapToChild,
       Merger<Model, ChildModel> merge) {
-    _childStream = StreamController.broadcast();
-    final _safeMapToChild = (Model m) {
-      try {
-        return mapToChild(m);
-      } catch (_) {
-        return null;
-      }
-    };
-    _firstModel = _safeMapToChild(original.firstModel);
+    _firstModel = mapToChild(original.firstModel);
     _childSubscription = original.changes.listen((model) {
-      final _nextChild = _safeMapToChild(model);
+      final _nextChild = mapToChild(model);
       if (_nextChild == null) {
         dispose();
       } else {
@@ -56,8 +49,8 @@ abstract class MappedMessenger<Model, ChildModel>
 
   @override
   void dispose() {
-    _childSubscription?.cancel();
-    _childStream?.close();
+    _childSubscription.cancel();
+    _childStream.close();
   }
 
   @override
@@ -82,12 +75,12 @@ abstract class MappedMessenger<Model, ChildModel>
   /// Uses the latest model to do some computation
   void doWithModel(
     FutureOr<void> action(ChildModel model), {
-    Update<ChildModel> onSuccessUpdate(ChildModel model),
-    ChildModel onSuccessModel(ChildModel model),
-    Cmd<ChildModel> onSuccessCommands,
-    Update<ChildModel> onErrorUpdate(ChildModel model, Exception e),
-    ChildModel onErrorModel(ChildModel model, Exception e),
-    Cmd<ChildModel> onErrorCommands(Exception e),
+    Update<ChildModel> onSuccessUpdate(ChildModel model)?,
+    ChildModel onSuccessModel(ChildModel model)?,
+    Cmd<ChildModel>? onSuccessCommands,
+    Update<ChildModel> onErrorUpdate(ChildModel model, Exception e)?,
+    ChildModel onErrorModel(ChildModel model, Exception e)?,
+    Cmd<ChildModel> onErrorCommands(Exception e)?,
   }) =>
       dispatcher((model) => Update(model,
           commands: Cmd.ofAction(() async => action(model),

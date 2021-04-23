@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:todoapp/all/all_messenger.dart';
 import 'package:todoapp/all/all_model.dart';
 import 'package:mvu_layer/mvu_layer.dart';
@@ -6,7 +7,7 @@ import 'package:todoapp/todo/service/load_todos_service.dart';
 import 'package:todoapp/todo/todo_item_model.dart';
 import 'package:todoapp/todo/todo_model.dart';
 
-class TodoMessenger extends MappedMessenger<AllModel, TodoModel> {
+class TodoMessenger extends MappedMessenger<AllMessenger, AllModel, TodoModel> {
   final LoadTodoService _service;
 
   TodoMessenger(this._service, AllMessenger parent)
@@ -20,7 +21,7 @@ class TodoMessenger extends MappedMessenger<AllModel, TodoModel> {
   static Update<TodoModel> init(LoadTodoService service) => Update(
         TodoModel((b) => b.loadingExternal = true),
         commands: Cmd.ofFunc(service.loadTodos,
-            onSuccessModel: (model, loadedItems) {
+            onSuccessModel: (model, BuiltList<TodoItem> loadedItems) {
               final maxId = loadedItems.last.id;
               return model.rebuild((b) => b
                 ..items.addAll(loadedItems)

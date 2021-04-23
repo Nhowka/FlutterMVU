@@ -1,3 +1,7 @@
+# 0.2.0
+
+- Null safety soundness
+
 # 0.1.13
 
 - Simplify `MsgConnector` code

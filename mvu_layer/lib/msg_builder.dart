@@ -9,14 +9,14 @@ typedef MsgWidgetBuilderWithTickerProvider<Model, MsgConnector> = Widget
 /// Stateful widget that uses the messenger state to render the view and the
 /// messenger dispatcher to change it
 class MsgBuilder<T extends Messenger<Model>, Model> extends StatefulWidget {
-  final Messenger<Model> _messenger;
+  final T _messenger;
   final MsgWidgetBuilder<Model, T> _builder;
-  final ValueChanged<BuildContext> _onInit;
+  final ValueChanged<BuildContext>? _onInit;
 
   const MsgBuilder(
-      {Messenger<Model> messenger,
-      MsgWidgetBuilder<Model, T> builder,
-      ValueChanged<BuildContext> onInit})
+      {required T messenger,
+      required MsgWidgetBuilder<Model, T> builder,
+      ValueChanged<BuildContext>? onInit})
       : _builder = builder,
         _messenger = messenger,
         _onInit = onInit;
@@ -27,9 +27,9 @@ class MsgBuilder<T extends Messenger<Model>, Model> extends StatefulWidget {
 
 class _MsgBuilderState<T extends Messenger<Model>, Model>
     extends State<MsgBuilder<T, Model>> {
-  StreamSubscription<Model> _changesSub;
-  Messenger<Model> _messenger;
-  Model _latestModel;
+  late final StreamSubscription<Model> _changesSub;
+  final T _messenger;
+  late Model _latestModel;
 
   _MsgBuilderState(this._messenger) {
     _latestModel = _messenger.firstModel;
@@ -63,14 +63,14 @@ class _MsgBuilderState<T extends Messenger<Model>, Model>
 /// messenger dispatcher to change it with an extra [TickerProvider]
 class MsgBuilderWithTickerProvider<T extends Messenger<Model>, Model>
     extends StatefulWidget {
-  final Messenger<Model> _messenger;
+  final T _messenger;
   final MsgWidgetBuilderWithTickerProvider<Model, T> _builder;
-  final ValueChanged<BuildContext> _onInit;
+  final ValueChanged<BuildContext>? _onInit;
 
   const MsgBuilderWithTickerProvider(
-      {Messenger<Model> messenger,
-      MsgWidgetBuilderWithTickerProvider<Model, T> builder,
-      ValueChanged<BuildContext> onInit})
+      {required T messenger,
+      required MsgWidgetBuilderWithTickerProvider<Model, T> builder,
+      ValueChanged<BuildContext>? onInit})
       : _builder = builder,
         _messenger = messenger,
         _onInit = onInit;
@@ -83,9 +83,9 @@ class MsgBuilderWithTickerProvider<T extends Messenger<Model>, Model>
 class _MsgBuilderWithTickerProviderState<T extends Messenger<Model>, Model>
     extends State<MsgBuilderWithTickerProvider<T, Model>>
     with SingleTickerProviderStateMixin {
-  StreamSubscription<Model> _changesSub;
-  Messenger<Model> _messenger;
-  Model _latestModel;
+  late final StreamSubscription<Model> _changesSub;
+  final T _messenger;
+  late Model _latestModel;
 
   _MsgBuilderWithTickerProviderState(this._messenger) {
     _latestModel = _messenger.firstModel;

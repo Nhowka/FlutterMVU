@@ -52,19 +52,19 @@ class Cmd<Model> {
               };
       return (Dispatch<Model> d) => sub(dispatcherMapper(d));
     }).toList();
-    return new Cmd(mapped);
+    return Cmd(mapped);
   }
 
   /// Do some action. Optionally dispatch a message if the action was successful
   /// and dispatch a message on case of Exception
   static Cmd<Model> ofAction<Model>(
     FutureOr<void> action(), {
-    Update<Model> onSuccessUpdate(Model model),
-    Model onSuccessModel(Model model),
-    Cmd<Model> onSuccessCommands,
-    Update<Model> onErrorUpdate(Model model, Exception e),
-    Model onErrorModel(Model model, Exception e),
-    Cmd<Model> onErrorCommands(Exception e),
+    Update<Model> onSuccessUpdate(Model model)?,
+    Model onSuccessModel(Model model)?,
+    Cmd<Model>? onSuccessCommands,
+    Update<Model> onErrorUpdate(Model model, Exception e)?,
+    Model onErrorModel(Model model, Exception e)?,
+    Cmd<Model> onErrorCommands(Exception e)?,
   }) {
     return Cmd.ofSub((Dispatch<Model> dispatch) async {
       try {
@@ -92,12 +92,12 @@ class Cmd<Model> {
   /// and dispatch a message on case of Exception
   static Cmd<Model> ofAsyncValue<Model>(
     Future action, {
-    Update<Model> onSuccessUpdate(Model model),
-    Model onSuccessModel(Model model),
-    Cmd<Model> onSuccessCommands,
-    Update<Model> onErrorUpdate(Model model, Exception e),
-    Model onErrorModel(Model model, Exception e),
-    Cmd<Model> onErrorCommands(Exception e),
+    Update<Model> onSuccessUpdate(Model model)?,
+    Model onSuccessModel(Model model)?,
+    Cmd<Model>? onSuccessCommands,
+    Update<Model> onErrorUpdate(Model model, Exception e)?,
+    Model onErrorModel(Model model, Exception e)?,
+    Cmd<Model> onErrorCommands(Exception e)?,
   }) {
     return Cmd.ofSub((dispatch) async {
       try {
@@ -125,12 +125,12 @@ class Cmd<Model> {
   /// Optionally takes a function to dispatch a message on Exception.
   static Cmd<Model> ofFunc<Result, Model>(
     FutureOr<Result> func(), {
-    Update<Model> onSuccessUpdate(Model model, Result r),
-    Model onSuccessModel(Model model, Result r),
-    Cmd<Model> onSuccessCommands(Result r),
-    Update<Model> onErrorUpdate(Model model, Exception e),
-    Model onErrorModel(Model model, Exception e),
-    Cmd<Model> onErrorCommands(Exception e),
+    Update<Model> onSuccessUpdate(Model model, Result r)?,
+    Model onSuccessModel(Model model, Result r)?,
+    Cmd<Model> onSuccessCommands(Result r)?,
+    Update<Model> onErrorUpdate(Model model, Exception e)?,
+    Model onErrorModel(Model model, Exception e)?,
+    Cmd<Model> onErrorCommands(Exception e)?,
   }) {
     return Cmd.ofSub((dispatch) async {
       try {
@@ -160,12 +160,12 @@ class Cmd<Model> {
   /// Optionally takes a function to dispatch a message on Exception.
   static Cmd<Model> ofModelFunc<Result, Model>(
     FutureOr<Result> func(Model model), {
-    Update<Model> onSuccessUpdate(Model model, Result r),
-    Cmd<Model> onSuccessCommands(Result r),
-    Model onSuccessModel(Model model, Result r),
-    Update<Model> onErrorUpdate(Model model, Exception e),
-    Model onErrorModel(Model model, Exception e),
-    Cmd<Model> onErrorCommands(Exception e),
+    Update<Model> onSuccessUpdate(Model model, Result r)?,
+    Cmd<Model> onSuccessCommands(Result r)?,
+    Model onSuccessModel(Model model, Result r)?,
+    Update<Model> onErrorUpdate(Model model, Exception e)?,
+    Model onErrorModel(Model model, Exception e)?,
+    Cmd<Model> onErrorCommands(Exception e)?,
   }) {
     return Cmd.ofSub((dispatch) => dispatch((model) => Update(model,
         commands: Cmd.ofFunc(
@@ -182,37 +182,41 @@ class Cmd<Model> {
   /// Creates a cancelable message from a future message that
   /// can send a different message when cancelled
   static Cmd<Model> ofCancelableMsg<Model>(
-      BehaviorMsg<Model> cancellableMsg(void cancel()),
-      FutureOr<BehaviorMsg<Model>> onComplete,
-      FutureOr<BehaviorMsg<Model>> onCancel) {
+      {required BehaviorMsg<Model> cancellableMsg(void cancel()),
+      required Future<BehaviorMsg<Model>> onComplete,
+      required BehaviorMsg<Model> onCancel}) {
     return Cmd.ofSub((dispatch) async {
       final cancellation =
           CancelableOperation<BehaviorMsg<Model>>.fromFuture(onComplete);
       dispatch(cancellableMsg(cancellation.cancel));
       final result = await cancellation.valueOrCancellation(onCancel);
-      dispatch(result);
+      if (result != null) {
+        dispatch(result);
+      }
     });
   }
 
   /// Creates a cancelable message from a future message that
   /// can send a different message when cancelled
   static Cmd<Model> ofCancelableModelMsg<Model>(
-      Model Function(Model) cancellableMsg(void cancel()),
-      FutureOr<Model Function(Model)> onComplete,
-      FutureOr<Model> Function(Model) onCancel) {
+      {required Model Function(Model) cancellableMsg(void cancel()),
+      required Future<Model Function(Model)> onComplete,
+      required Model Function(Model) onCancel}) {
     return Cmd.ofSub((dispatch) async {
       final cancellation =
           CancelableOperation<Model Function(Model)>.fromFuture(onComplete);
       dispatch(fromModelMsg(cancellableMsg(cancellation.cancel)));
       final result = await cancellation.valueOrCancellation(onCancel);
-      dispatch(fromModelMsg(result));
+      if (result != null) {
+        dispatch(fromModelMsg(result));
+      }
     });
   }
 
   /// Takes a Msg. Optionally takes a function to
   /// dispatch a message if awaiting the Msg fails
   static Cmd<Model> ofMsg<Model>(FutureOr<BehaviorMsg<Model>> asyncMsg,
-      {BehaviorMsg<Model> onError(Exception e)}) {
+      {BehaviorMsg<Model> onError(Exception e)?}) {
     return Cmd.ofSub((dispatch) async {
       try {
         final result = await asyncMsg;
@@ -228,7 +232,7 @@ class Cmd<Model> {
   /// Takes an async model Msg. Optionally takes a function to
   /// dispatch a message if awaiting the Msg fails
   static Cmd<Model> ofModelMsg<Model>(FutureOr<Model Function(Model)> asyncMsg,
-      {BehaviorMsg<Model> onError(Exception e)}) {
+      {BehaviorMsg<Model> onError(Exception e)?}) {
     return Cmd.ofSub((dispatch) async {
       try {
         final result = await asyncMsg;
@@ -257,10 +261,10 @@ class Update<Model> {
 }
 
 class MsgProcessor<Model> {
-  Model _currentModel;
+  late Model _currentModel;
   final StreamController<BehaviorMsg<Model>> _mainLoop = StreamController();
   final StreamController<Model> changes = StreamController.broadcast();
-  StreamSubscription<Update<Model>> _appLoopSub;
+  late final StreamSubscription<BehaviorMsg<Model>> _appLoopSub;
 
   Update<Model> init;
 
@@ -279,13 +283,13 @@ class MsgProcessor<Model> {
   MsgProcessor(this.init) {
     var newModel = init.model;
 
-    /// Filters only valid message and model pairs to the stream
-    final mainLoopStream = _mainLoop.stream.map((BehaviorMsg<Model> msg) {
-      return (msg != null && _currentModel != null) ? msg(newModel) : null;
-    }).where((x) => x != null);
     _currentModel = newModel;
 
-    _appLoopSub = mainLoopStream.listen((updates) {
+    changes.add(newModel);
+
+    _appLoopSub = _mainLoop.stream.listen((BehaviorMsg<Model> msg) {
+      final updates = msg(newModel);
+
       /// Sets the state again on each new message
       newModel = updates.model;
       if (updates.doRebuild && !changes.isClosed) {
@@ -299,7 +303,7 @@ class MsgProcessor<Model> {
   }
 
   void dispose() {
-    _appLoopSub?.cancel();
+    _appLoopSub.cancel();
     changes.close();
     _mainLoop.close();
   }

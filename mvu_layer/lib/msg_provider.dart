@@ -17,17 +17,17 @@ typedef ChildCreator<
 abstract class Messenger<Model> {
   /// Dispatch a message created using a function
   Dispatch<Model> get dispatcher => _dispatcher;
-  Dispatch<Model> _dispatcher;
-  Stream<Model> _changes;
+  late final Dispatch<Model> _dispatcher;
+  late final Stream<Model> _changes;
 
   Stream<Model> get changes => _changes;
 
   Model get firstModel => _processor._currentModel;
-  MsgProcessor<Model> _processor;
+  late final MsgProcessor<Model> _processor;
   List<Messenger> _dependents = [];
 
   void addDependent(Messenger dependent) {
-    if (dependent != null) _dependents.add(dependent);
+    _dependents.add(dependent);
   }
 
   void reset() {
@@ -61,12 +61,12 @@ abstract class Messenger<Model> {
   /// Uses the latest model to do some computation
   void doWithModel(
     FutureOr<void> action(Model model), {
-    Update<Model> onSuccessUpdate(Model model),
-    Model onSuccessModel(Model model),
-    Cmd<Model> onSuccessCommands,
-    Update<Model> onErrorUpdate(Model model, Exception e),
-    Model onErrorModel(Model model, Exception e),
-    Cmd<Model> onErrorCommands(Exception e),
+    Update<Model> onSuccessUpdate(Model model)?,
+    Model onSuccessModel(Model model)?,
+    Cmd<Model>? onSuccessCommands,
+    Update<Model> onErrorUpdate(Model model, Exception e)?,
+    Model onErrorModel(Model model, Exception e)?,
+    Cmd<Model> onErrorCommands(Exception e)?,
   }) =>
       dispatcher((model) => Update(model,
           commands: Cmd.ofAction(() async => action(model),
@@ -85,14 +85,18 @@ class MsgProvider<Model> extends StatefulWidget {
   final List<Type> dependsOn;
   final Widget child;
 
-  static Messenger<Model> of<Model>(BuildContext context) => context
+  static Messenger<Model>? of<Model>(BuildContext context) => context
       .dependOnInheritedWidgetOfExactType<_InheritedMsgProvider<Model>>()
-      .messenger;
+      ?.messenger;
 
-  MsgProvider({this.messenger, this.child, this.dependsOn = const [], Key key})
+  MsgProvider(
+      {required this.messenger,
+      required this.child,
+      this.dependsOn = const [],
+      Key? key})
       : super(key: key);
 
-  MsgProvider<Model> copyWith({Widget child}) => MsgProvider(
+  MsgProvider<Model> copyWith({Widget? child}) => MsgProvider(
         messenger: messenger,
         child: child ?? this.child,
         dependsOn: dependsOn,
@@ -110,7 +114,7 @@ class _MsgProviderDisposer<Model> extends State<MsgProvider<Model>> {
 
   @override
   void dispose() {
-    widget?.messenger?.dispose();
+    widget.messenger.dispose();
     super.dispose();
   }
 }
@@ -127,12 +131,10 @@ class _InheritedMsgProvider<Model> extends InheritedWidget {
 /// Creates a tree with all providers
 class MsgProviderTree extends StatelessWidget {
   const MsgProviderTree({
-    Key key,
-    @required this.providers,
-    @required this.child,
-  })  : assert(providers != null),
-        assert(child != null),
-        super(key: key);
+    Key? key,
+    required this.providers,
+    required this.child,
+  }) : super(key: key);
 
   final List<MsgProvider> providers;
   final Widget child;

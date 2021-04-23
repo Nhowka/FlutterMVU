@@ -26,27 +26,14 @@ class MyApp extends StatelessWidget {
 class HomeModel {
   final String title;
   final int counter;
-  HomeModel({this.title, this.counter});
+  HomeModel({required this.title, required this.counter});
   HomeModel copyWith({title, counter}) =>
       HomeModel(title: title ?? this.title, counter: counter ?? this.counter);
 }
 
-void autoCounter(Function(BehaviorMsg<HomeModel>) dispatch) {
-  Timer.periodic(const Duration(seconds: 1), (timer) {
-    dispatch((model) {
-      if (model.counter > 30) timer.cancel();
-
-      return Update(model.counter > 0
-          ? model.copyWith(counter: model.counter - 1)
-          : model);
-    });
-  });
-}
-
 class HomeMessenger extends Messenger<HomeModel> {
   HomeMessenger(title)
-      : super(Update(HomeModel(title: title, counter: 0),
-            commands: Cmd.ofSub(autoCounter)));
+      : super.model(HomeModel(title: title, counter: 0));
 
   void increment() =>
       modelDispatcher((model) => model.copyWith(counter: model.counter + 1));

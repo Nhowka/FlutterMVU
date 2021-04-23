@@ -11,10 +11,10 @@ import 'mock_todo_service.dart';
 
 main() {
   LoadTodoService _service;
-  AllMessenger _amsg;
-  TodoMessenger _msg;
+  late AllMessenger _amsg;
+  late TodoMessenger _msg;
 
-  TodoModel _latestModel;
+  late TodoModel _latestModel;
 
   setUp(() async {
     _service = MockTodoService();

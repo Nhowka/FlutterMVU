@@ -15,9 +15,9 @@ class _$AllModelSerializer implements StructuredSerializer<AllModel> {
   final String wireName = 'AllModel';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, AllModel object,
+  Iterable<Object?> serialize(Serializers serializers, AllModel object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'page',
       serializers.serialize(object.page, specifiedType: const FullType(Pages)),
       'todos',
@@ -32,7 +32,7 @@ class _$AllModelSerializer implements StructuredSerializer<AllModel> {
   }
 
   @override
-  AllModel deserialize(Serializers serializers, Iterable<Object> serialized,
+  AllModel deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new AllModelBuilder();
 
@@ -40,7 +40,7 @@ class _$AllModelSerializer implements StructuredSerializer<AllModel> {
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'page':
           result.page = serializers.deserialize(value,
@@ -48,11 +48,11 @@ class _$AllModelSerializer implements StructuredSerializer<AllModel> {
           break;
         case 'todos':
           result.todos.replace(serializers.deserialize(value,
-              specifiedType: const FullType(TodoModel)) as TodoModel);
+              specifiedType: const FullType(TodoModel))! as TodoModel);
           break;
         case 'counter':
           result.counter.replace(serializers.deserialize(value,
-              specifiedType: const FullType(CounterModel)) as CounterModel);
+              specifiedType: const FullType(CounterModel))! as CounterModel);
           break;
       }
     }
@@ -69,19 +69,14 @@ class _$AllModel extends AllModel {
   @override
   final CounterModel counter;
 
-  factory _$AllModel([void Function(AllModelBuilder) updates]) =>
+  factory _$AllModel([void Function(AllModelBuilder)? updates]) =>
       (new AllModelBuilder()..update(updates)).build();
 
-  _$AllModel._({this.page, this.todos, this.counter}) : super._() {
-    if (page == null) {
-      throw new BuiltValueNullFieldError('AllModel', 'page');
-    }
-    if (todos == null) {
-      throw new BuiltValueNullFieldError('AllModel', 'todos');
-    }
-    if (counter == null) {
-      throw new BuiltValueNullFieldError('AllModel', 'counter');
-    }
+  _$AllModel._({required this.page, required this.todos, required this.counter})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(page, 'AllModel', 'page');
+    BuiltValueNullFieldError.checkNotNull(todos, 'AllModel', 'todos');
+    BuiltValueNullFieldError.checkNotNull(counter, 'AllModel', 'counter');
   }
 
   @override
@@ -117,30 +112,31 @@ class _$AllModel extends AllModel {
 }
 
 class AllModelBuilder implements Builder<AllModel, AllModelBuilder> {
-  _$AllModel _$v;
+  _$AllModel? _$v;
 
-  Pages _page;
-  Pages get page => _$this._page;
-  set page(Pages page) => _$this._page = page;
+  Pages? _page;
+  Pages? get page => _$this._page;
+  set page(Pages? page) => _$this._page = page;
 
-  TodoModelBuilder _todos;
+  TodoModelBuilder? _todos;
   TodoModelBuilder get todos => _$this._todos ??= new TodoModelBuilder();
-  set todos(TodoModelBuilder todos) => _$this._todos = todos;
+  set todos(TodoModelBuilder? todos) => _$this._todos = todos;
 
-  CounterModelBuilder _counter;
+  CounterModelBuilder? _counter;
   CounterModelBuilder get counter =>
       _$this._counter ??= new CounterModelBuilder();
-  set counter(CounterModelBuilder counter) => _$this._counter = counter;
+  set counter(CounterModelBuilder? counter) => _$this._counter = counter;
 
   AllModelBuilder() {
     AllModel._initializeBuilder(this);
   }
 
   AllModelBuilder get _$this {
-    if (_$v != null) {
-      _page = _$v.page;
-      _todos = _$v.todos?.toBuilder();
-      _counter = _$v.counter?.toBuilder();
+    final $v = _$v;
+    if ($v != null) {
+      _page = $v.page;
+      _todos = $v.todos.toBuilder();
+      _counter = $v.counter.toBuilder();
       _$v = null;
     }
     return this;
@@ -148,14 +144,12 @@ class AllModelBuilder implements Builder<AllModel, AllModelBuilder> {
 
   @override
   void replace(AllModel other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$AllModel;
   }
 
   @override
-  void update(void Function(AllModelBuilder) updates) {
+  void update(void Function(AllModelBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -165,9 +159,12 @@ class AllModelBuilder implements Builder<AllModel, AllModelBuilder> {
     try {
       _$result = _$v ??
           new _$AllModel._(
-              page: page, todos: todos.build(), counter: counter.build());
+              page: BuiltValueNullFieldError.checkNotNull(
+                  page, 'AllModel', 'page'),
+              todos: todos.build(),
+              counter: counter.build());
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'todos';
         todos.build();

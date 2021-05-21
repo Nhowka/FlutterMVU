@@ -23,8 +23,10 @@ class TodoApp extends StatelessWidget {
         home: Scaffold(
             appBar:
                 AppBar(backgroundColor: Colors.lightGreen, title: Text("=)")),
-            body: MsgBuilder<AllMessenger, AllModel>(
-                messenger: AllMessenger(_service),
-                builder: AllWidget.builder)));
+            body: MsgProvider<AllMessenger, AllModel>(
+              messenger: AllMessenger(_service),
+              child: MsgConnector<AllMessenger, AllModel>(
+                  builder: AllWidget.builder),
+            )));
   }
 }

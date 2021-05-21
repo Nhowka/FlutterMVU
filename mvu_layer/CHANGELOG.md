@@ -1,3 +1,8 @@
+# 0.2.1-connector-preview
+
+- Type the messenger on provider
+- Change the connector to a stateless widget
+
 # 0.2.0
 
 - Null safety soundness

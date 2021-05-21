@@ -3,6 +3,12 @@ part of 'mvu_layer.dart';
 typedef MessengerCreator<Model> = Messenger<Model> Function(
     MsgProcessor<Model>);
 
+typedef MessengerInitializer<Connector extends Messenger<Model>, Model> = void
+    Function(Connector);
+
+typedef MessengerDisposer<Connector extends Messenger<Model>, Model> = void
+    Function(Connector);
+
 typedef ChildCreator<
         ChildMessenger extends Messenger<ChildModel>,
         ChildModel,
@@ -80,37 +86,53 @@ abstract class Messenger<Model> {
 
 /// Creates a way to pass a [Messenger] along the widget tree to be consumed
 /// by a child [MsgConnector]
-class MsgProvider<Model> extends StatefulWidget {
-  final Messenger<Model> messenger;
+class MsgProvider<Connector extends Messenger<Model>, Model>
+    extends StatefulWidget {
+  final Connector messenger;
   final List<Type> dependsOn;
   final Widget child;
+  final MessengerInitializer<Connector, Model>? onInit;
 
-  static Messenger<Model>? of<Model>(BuildContext context) => context
-      .dependOnInheritedWidgetOfExactType<_InheritedMsgProvider<Model>>()
-      ?.messenger;
+  static Connector? of<Connector extends Messenger<Model>, Model>(
+          BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<
+              _InheritedMsgProvider<Connector, Model>>()
+          ?.messenger;
 
   MsgProvider(
       {required this.messenger,
       required this.child,
       this.dependsOn = const [],
+      this.onInit,
       Key? key})
       : super(key: key);
 
-  MsgProvider<Model> copyWith({Widget? child}) => MsgProvider(
+  MsgProvider<Connector, Model> copyWith({required Widget child}) =>
+      MsgProvider(
         messenger: messenger,
-        child: child ?? this.child,
+        child: child,
         dependsOn: dependsOn,
+        onInit: onInit,
         key: key,
       );
 
   @override
-  _MsgProviderDisposer createState() => _MsgProviderDisposer<Model>();
+  _MsgProviderDisposer createState() =>
+      _MsgProviderDisposer<Connector, Model>();
 }
 
-class _MsgProviderDisposer<Model> extends State<MsgProvider<Model>> {
+class _MsgProviderDisposer<Connector extends Messenger<Model>, Model>
+    extends State<MsgProvider<Connector, Model>> {
   @override
   Widget build(BuildContext context) =>
-      _InheritedMsgProvider<Model>(widget.messenger, widget.child);
+      _InheritedMsgProvider<Connector, Model>(widget.messenger, widget.child);
+
+  @override
+  void initState() {
+    super.initState();
+    widget.onInit?.call(widget.messenger);
+  }
 
   @override
   void dispose() {
@@ -119,8 +141,9 @@ class _MsgProviderDisposer<Model> extends State<MsgProvider<Model>> {
   }
 }
 
-class _InheritedMsgProvider<Model> extends InheritedWidget {
-  final Messenger<Model> messenger;
+class _InheritedMsgProvider<Connector extends Messenger<Model>, Model>
+    extends InheritedWidget {
+  final Connector messenger;
 
   _InheritedMsgProvider(this.messenger, child) : super(child: child);
 

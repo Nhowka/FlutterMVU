@@ -33,8 +33,8 @@ class TodoMessenger extends MappedMessenger<AllMessenger, AllModel, TodoModel> {
       );
 
   // Implements the message with behaviour to add a new to do item
-  void addTodo(String content) => modelDispatcher((model) =>
-      content == null || content.trim().length == 0 || model.loadingExternal
+  void addTodo(String content) => modelDispatcher(
+      (model) => content.trim().length == 0 || model.loadingExternal
           ? model
           : model.rebuild((b) => b
             ..nextId = model.nextId + 1

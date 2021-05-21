@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:mvu_layer/mvu_layer.dart';
 
@@ -26,14 +24,15 @@ class MyApp extends StatelessWidget {
 class HomeModel {
   final String title;
   final int counter;
+
   HomeModel({required this.title, required this.counter});
+
   HomeModel copyWith({title, counter}) =>
       HomeModel(title: title ?? this.title, counter: counter ?? this.counter);
 }
 
 class HomeMessenger extends Messenger<HomeModel> {
-  HomeMessenger(title)
-      : super.model(HomeModel(title: title, counter: 0));
+  HomeMessenger(title) : super.model(HomeModel(title: title, counter: 0));
 
   void increment() =>
       modelDispatcher((model) => model.copyWith(counter: model.counter + 1));

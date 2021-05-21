@@ -297,7 +297,7 @@ packages:
       path: "../mvu_layer"
       relative: true
     source: path
-    version: "0.1.13"
+    version: "0.2.1"
   optional:
     dependency: "direct main"
     description:

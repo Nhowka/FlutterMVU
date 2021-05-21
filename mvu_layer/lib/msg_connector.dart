@@ -2,38 +2,21 @@ part of 'mvu_layer.dart';
 
 /// Use a [Messenger] from a [MsgProvider] up the widget tree
 class MsgConnector<Connector extends Messenger<Model>, Model>
-    extends StatefulWidget {
+    extends StatelessWidget {
   const MsgConnector({
     Key? key,
     required this.builder,
     this.onInit,
-    this.onDispose,
   }) : super(key: key);
 
   final MsgWidgetBuilder<Model, Connector> builder;
-  final VoidCallback? onInit;
-  final VoidCallback? onDispose;
+  final MessengerInitializer<Connector, Model>? onInit;
 
-  @override
-  _MsgConnectorState createState() => _MsgConnectorState<Connector, Model>();
-}
-
-class _MsgConnectorState<Connector extends Messenger<Model>, Model>
-    extends State<MsgConnector<Connector, Model>> {
-  @override
-  void initState() {
-    super.initState();
-    widget.onInit?.call();
+  Widget build(BuildContext context) {
+    final messenger = MsgProvider.of<Connector, Model>(context)!;
+    return MsgBuilder<Connector, Model>(
+        messenger: messenger,
+        onInit: (context) => onInit?.call(messenger),
+        builder: builder);
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-    widget.onDispose?.call();
-  }
-
-  @override
-  Widget build(BuildContext context) => MsgBuilder<Connector, Model>(
-      messenger: MsgProvider.of<Model>(context) as Connector,
-      builder: widget.builder);
 }

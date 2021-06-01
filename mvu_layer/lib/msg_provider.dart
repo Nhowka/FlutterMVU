@@ -102,7 +102,7 @@ class MsgProvider<Connector extends Messenger<Model>, Model>
 
   MsgProvider(
       {required this.messenger,
-      required this.child,
+      this.child = const SizedBox.shrink(),
       this.dependsOn = const [],
       this.onInit,
       Key? key})

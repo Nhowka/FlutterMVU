@@ -1,3 +1,7 @@
+# 0.2.1
+
+- Fixes the `MsgProviderTree` by not requiring a child on `MsgProvider`
+
 # 0.2.1-connector-preview
 
 - Type the messenger on provider

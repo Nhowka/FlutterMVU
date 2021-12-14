@@ -1,3 +1,7 @@
+# 0.2.2
+
+- New helper `ofModelAction` to use the latest model as argument of the action
+
 # 0.2.1
 
 - Fixes the `MsgProviderTree` by not requiring a child on `MsgProvider`

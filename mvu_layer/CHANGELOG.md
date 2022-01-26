@@ -1,3 +1,7 @@
+# 0.2.3
+
+- Accept `doRebuild` on most `Cmd` helpers so it's possible to skip the rendering between some commands
+
 # 0.2.2
 
 - New helper `ofModelAction` to use the latest model as argument of the action

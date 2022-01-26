@@ -4,8 +4,11 @@ part of 'mvu_layer.dart';
 /// model and optionally extra commands to send future messages
 typedef BehaviorMsg<Model> = Update<Model> Function(Model);
 
-BehaviorMsg<Model> fromModelMsg<Model>(Model fn(Model model)) =>
-    (model) => Update(fn(model));
+BehaviorMsg<Model> fromModelMsg<Model>(
+  Model fn(Model model), {
+  bool doRebuild = true,
+}) =>
+    (model) => Update(fn(model), doRebuild: doRebuild);
 
 /// Alias for a function that takes a message and returns void
 typedef Dispatch<Model> = void Function(BehaviorMsg<Model>);
@@ -25,8 +28,13 @@ class Cmd<Model> {
       : this([(Dispatch<Model> dispatch) => dispatch(msg)]);
 
   /// Creates a new Cmd from a function returning Model
-  Cmd.ofFunctionModel(Model msg(Model model))
-      : this([(Dispatch<Model> dispatch) => dispatch(fromModelMsg(msg))]);
+  Cmd.ofFunctionModel(
+    Model msg(Model model), {
+    bool doRebuild = true,
+  }) : this([
+          (Dispatch<Model> dispatch) =>
+              dispatch(fromModelMsg(msg, doRebuild: doRebuild))
+        ]);
 
   /// Creates a new Cmd from a Sub
   Cmd.ofSub(Sub<Model> sub) : this([sub]);
@@ -65,26 +73,31 @@ class Cmd<Model> {
     Update<Model> onErrorUpdate(Model model, Exception e)?,
     Model onErrorModel(Model model, Exception e)?,
     Cmd<Model> onErrorCommands(Exception e)?,
-  }) => Cmd.ofSub((Dispatch<Model> dispatch) async {
-      try {
-        await action();
-        if (onSuccessUpdate != null) {
-          dispatch(onSuccessUpdate);
-        } else if (onSuccessModel != null) {
-          dispatch(fromModelMsg(onSuccessModel));
-        } else if (onSuccessCommands != null) {
-          dispatch((model) => Update(model, commands: onSuccessCommands));
+    bool doRebuild = true,
+  }) =>
+      Cmd.ofSub((Dispatch<Model> dispatch) async {
+        try {
+          await action();
+          if (onSuccessUpdate != null) {
+            dispatch(onSuccessUpdate);
+          } else if (onSuccessModel != null) {
+            dispatch(fromModelMsg(onSuccessModel, doRebuild: doRebuild));
+          } else if (onSuccessCommands != null) {
+            dispatch((model) => Update(model,
+                commands: onSuccessCommands, doRebuild: doRebuild));
+          }
+        } on Exception catch (e) {
+          if (onErrorUpdate != null) {
+            dispatch((model) => onErrorUpdate(model, e));
+          } else if (onErrorModel != null) {
+            dispatch(fromModelMsg((model) => onErrorModel(model, e),
+                doRebuild: doRebuild));
+          } else if (onErrorCommands != null) {
+            dispatch((model) => Update(model,
+                commands: onErrorCommands(e), doRebuild: doRebuild));
+          }
         }
-      } on Exception catch (e) {
-        if (onErrorUpdate != null) {
-          dispatch((model) => onErrorUpdate(model, e));
-        } else if (onErrorModel != null) {
-          dispatch(fromModelMsg((model) => onErrorModel(model, e)));
-        } else if (onErrorCommands != null) {
-          dispatch((model) => Update(model, commands: onErrorCommands(e)));
-        }
-      }
-    });
+      });
 
   /// Do some action receiving the current model. Optionally dispatch a message
   /// if the action was successful and dispatch a message on case of Exception
@@ -96,17 +109,17 @@ class Cmd<Model> {
     Update<Model> onErrorUpdate(Model model, Exception e)?,
     Model onErrorModel(Model model, Exception e)?,
     Cmd<Model> onErrorCommands(Exception e)?,
+    bool doRebuild = true,
   }) =>
       Cmd.ofSub((dispatch) => dispatch((model) => Update(model,
-          commands: Cmd.ofAction(
-            () => action(model),
-            onErrorUpdate: onErrorUpdate,
-            onErrorCommands: onErrorCommands,
-            onSuccessUpdate: onSuccessUpdate,
-            onErrorModel: onErrorModel,
-            onSuccessModel: onSuccessModel,
-            onSuccessCommands: onSuccessCommands,
-          ))));
+          commands: Cmd.ofAction(() => action(model),
+              onErrorUpdate: onErrorUpdate,
+              onErrorCommands: onErrorCommands,
+              onSuccessUpdate: onSuccessUpdate,
+              onErrorModel: onErrorModel,
+              onSuccessModel: onSuccessModel,
+              onSuccessCommands: onSuccessCommands,
+              doRebuild: doRebuild))));
 
   /// Do some async action. Optionally dispatch a message if the action was successful
   /// and dispatch a message on case of Exception
@@ -118,6 +131,7 @@ class Cmd<Model> {
     Update<Model> onErrorUpdate(Model model, Exception e)?,
     Model onErrorModel(Model model, Exception e)?,
     Cmd<Model> onErrorCommands(Exception e)?,
+    bool doRebuild = true,
   }) =>
       Cmd.ofSub((dispatch) async {
         try {
@@ -125,17 +139,20 @@ class Cmd<Model> {
           if (onSuccessUpdate != null) {
             dispatch(onSuccessUpdate);
           } else if (onSuccessModel != null) {
-            dispatch(fromModelMsg(onSuccessModel));
+            dispatch(fromModelMsg(onSuccessModel, doRebuild: doRebuild));
           } else if (onSuccessCommands != null) {
-            dispatch((model) => Update(model, commands: onSuccessCommands));
+            dispatch((model) => Update(model,
+                commands: onSuccessCommands, doRebuild: doRebuild));
           }
         } on Exception catch (e) {
           if (onErrorUpdate != null) {
             dispatch((model) => onErrorUpdate(model, e));
           } else if (onErrorModel != null) {
-            dispatch(fromModelMsg((model) => onErrorModel(model, e)));
+            dispatch(fromModelMsg((model) => onErrorModel(model, e),
+                doRebuild: doRebuild));
           } else if (onErrorCommands != null) {
-            dispatch((model) => Update(model, commands: onErrorCommands(e)));
+            dispatch((model) => Update(model,
+                commands: onErrorCommands(e), doRebuild: doRebuild));
           }
         }
       });
@@ -150,6 +167,7 @@ class Cmd<Model> {
     Update<Model> onErrorUpdate(Model model, Exception e)?,
     Model onErrorModel(Model model, Exception e)?,
     Cmd<Model> onErrorCommands(Exception e)?,
+    bool doRebuild = true,
   }) =>
       Cmd.ofSub((dispatch) async {
         try {
@@ -157,18 +175,21 @@ class Cmd<Model> {
           if (onSuccessUpdate != null) {
             dispatch((model) => onSuccessUpdate(model, result));
           } else if (onSuccessModel != null) {
-            dispatch(fromModelMsg((model) => onSuccessModel(model, result)));
+            dispatch(fromModelMsg((model) => onSuccessModel(model, result),
+                doRebuild: doRebuild));
           } else if (onSuccessCommands != null) {
-            dispatch(
-                (model) => Update(model, commands: onSuccessCommands(result)));
+            dispatch((model) => Update(model,
+                commands: onSuccessCommands(result), doRebuild: doRebuild));
           }
         } on Exception catch (e) {
           if (onErrorUpdate != null) {
             dispatch((model) => onErrorUpdate(model, e));
           } else if (onErrorModel != null) {
-            dispatch(fromModelMsg((model) => onErrorModel(model, e)));
+            dispatch(fromModelMsg((model) => onErrorModel(model, e),
+                doRebuild: doRebuild));
           } else if (onErrorCommands != null) {
-            dispatch((model) => Update(model, commands: onErrorCommands(e)));
+            dispatch((model) => Update(model,
+                commands: onErrorCommands(e), doRebuild: doRebuild));
           }
         }
       });
@@ -184,17 +205,17 @@ class Cmd<Model> {
     Update<Model> onErrorUpdate(Model model, Exception e)?,
     Model onErrorModel(Model model, Exception e)?,
     Cmd<Model> onErrorCommands(Exception e)?,
+    bool doRebuild = true,
   }) =>
       Cmd.ofSub((dispatch) => dispatch((model) => Update(model,
-          commands: Cmd.ofFunc(
-            () => func(model),
-            onErrorUpdate: onErrorUpdate,
-            onErrorCommands: onErrorCommands,
-            onSuccessUpdate: onSuccessUpdate,
-            onErrorModel: onErrorModel,
-            onSuccessModel: onSuccessModel,
-            onSuccessCommands: onSuccessCommands,
-          ))));
+          commands: Cmd.ofFunc(() => func(model),
+              onErrorUpdate: onErrorUpdate,
+              onErrorCommands: onErrorCommands,
+              onSuccessUpdate: onSuccessUpdate,
+              onErrorModel: onErrorModel,
+              onSuccessModel: onSuccessModel,
+              onSuccessCommands: onSuccessCommands,
+              doRebuild: doRebuild))));
 
   /// Creates a cancelable message from a future message that
   /// can send a different message when cancelled
@@ -214,20 +235,23 @@ class Cmd<Model> {
 
   /// Creates a cancelable message from a future message that
   /// can send a different message when cancelled
-  static Cmd<Model> ofCancelableModelMsg<Model>(
-          {required Model Function(Model) cancellableMsg(void cancel()),
-          required Future<Model Function(Model)> onComplete,
-          required Model Function(Model) onCancel}) =>
+  static Cmd<Model> ofCancelableModelMsg<Model>({
+    required Model Function(Model) cancellableMsg(void cancel()),
+    required Future<Model Function(Model)> onComplete,
+    required Model Function(Model) onCancel,
+    bool doRebuild = true,
+  }) =>
       Cmd.ofSub((dispatch) async {
         final cancellation =
             CancelableOperation<Model Function(Model)>.fromFuture(onComplete);
 
-        dispatch(fromModelMsg(cancellableMsg(cancellation.cancel)));
+        dispatch(fromModelMsg(cancellableMsg(cancellation.cancel),
+            doRebuild: doRebuild));
 
         final result = await cancellation.valueOrCancellation(onCancel);
 
         if (result != null) {
-          dispatch(fromModelMsg(result));
+          dispatch(fromModelMsg(result, doRebuild: doRebuild));
         }
       });
 
@@ -248,12 +272,15 @@ class Cmd<Model> {
 
   /// Takes an async model Msg. Optionally takes a function to
   /// dispatch a message if awaiting the Msg fails
-  static Cmd<Model> ofModelMsg<Model>(FutureOr<Model Function(Model)> asyncMsg,
-          {BehaviorMsg<Model> onError(Exception e)?}) =>
+  static Cmd<Model> ofModelMsg<Model>(
+    FutureOr<Model Function(Model)> asyncMsg, {
+    BehaviorMsg<Model> onError(Exception e)?,
+    bool doRebuild = true,
+  }) =>
       Cmd.ofSub((dispatch) async {
         try {
           final result = await asyncMsg;
-          dispatch(fromModelMsg(result));
+          dispatch(fromModelMsg(result, doRebuild: doRebuild));
         } on Exception catch (ex) {
           if (onError != null) {
             dispatch(onError(ex));

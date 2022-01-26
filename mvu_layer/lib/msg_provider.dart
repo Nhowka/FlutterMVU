@@ -58,7 +58,11 @@ abstract class Messenger<Model> {
   }
 
   /// Dispatch a message that just returns the new model from the old model
-  void modelDispatcher(Model msg(Model model)) => dispatcher(fromModelMsg(msg));
+  void modelDispatcher(
+    Model msg(Model model), {
+    bool doRebuild = true,
+  }) =>
+      dispatcher(fromModelMsg(msg, doRebuild: doRebuild));
 
   /// Dispatch a command, reusing the same model
   void commandDispatcher(Cmd<Model> commands) =>
@@ -73,6 +77,7 @@ abstract class Messenger<Model> {
     Update<Model> onErrorUpdate(Model model, Exception e)?,
     Model onErrorModel(Model model, Exception e)?,
     Cmd<Model> onErrorCommands(Exception e)?,
+    bool doRebuild = true,
   }) =>
       dispatcher((model) => Update(model,
           commands: Cmd.ofAction(() async => action(model),
@@ -81,7 +86,8 @@ abstract class Messenger<Model> {
               onSuccessCommands: onSuccessCommands,
               onErrorUpdate: onErrorUpdate,
               onErrorModel: onErrorModel,
-              onErrorCommands: onErrorCommands)));
+              onErrorCommands: onErrorCommands,
+              doRebuild: doRebuild)));
 }
 
 /// Creates a way to pass a [Messenger] along the widget tree to be consumed

@@ -65,8 +65,11 @@ abstract class MappedMessenger<T extends Messenger<Model>, Model, ChildModel>
   ChildModel get firstModel => _firstModel;
 
   /// Dispatch a message that just returns the new model from the old model
-  void modelDispatcher(ChildModel msg(ChildModel model)) =>
-      dispatcher(fromModelMsg(msg));
+  void modelDispatcher(
+    ChildModel msg(ChildModel model), {
+    bool doRebuild = true,
+  }) =>
+      dispatcher(fromModelMsg(msg, doRebuild: doRebuild));
 
   /// Dispatch a command, reusing the same model
   void commandDispatcher(Cmd<ChildModel> commands) =>
@@ -81,6 +84,7 @@ abstract class MappedMessenger<T extends Messenger<Model>, Model, ChildModel>
     Update<ChildModel> onErrorUpdate(ChildModel model, Exception e)?,
     ChildModel onErrorModel(ChildModel model, Exception e)?,
     Cmd<ChildModel> onErrorCommands(Exception e)?,
+    bool doRebuild = true,
   }) =>
       dispatcher((model) => Update(model,
           commands: Cmd.ofAction(() async => action(model),
@@ -89,5 +93,6 @@ abstract class MappedMessenger<T extends Messenger<Model>, Model, ChildModel>
               onSuccessCommands: onSuccessCommands,
               onErrorUpdate: onErrorUpdate,
               onErrorModel: onErrorModel,
-              onErrorCommands: onErrorCommands)));
+              onErrorCommands: onErrorCommands,
+              doRebuild: doRebuild)));
 }

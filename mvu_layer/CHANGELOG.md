@@ -1,3 +1,7 @@
+# 0.2.4
+
+- Fix broken disposer of `MsgProvider. Offers an `onDispose` function instead.
+
 # 0.2.3
 
 - Accept `doRebuild` on most `Cmd` helpers so it's possible to skip the rendering between some commands

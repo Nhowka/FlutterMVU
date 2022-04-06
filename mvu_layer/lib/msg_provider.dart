@@ -98,6 +98,7 @@ class MsgProvider<Connector extends Messenger<Model>, Model>
   final List<Type> dependsOn;
   final Widget child;
   final MessengerInitializer<Connector, Model>? onInit;
+  final MessengerDisposer<Connector, Model>? onDispose;
 
   static Connector? of<Connector extends Messenger<Model>, Model>(
           BuildContext context) =>
@@ -111,6 +112,7 @@ class MsgProvider<Connector extends Messenger<Model>, Model>
       this.child = const SizedBox.shrink(),
       this.dependsOn = const [],
       this.onInit,
+      this.onDispose,
       Key? key})
       : super(key: key);
 
@@ -142,7 +144,7 @@ class _MsgProviderDisposer<Connector extends Messenger<Model>, Model>
 
   @override
   void dispose() {
-    widget.messenger.dispose();
+    widget.onDispose?.call(widget.messenger);
     super.dispose();
   }
 }

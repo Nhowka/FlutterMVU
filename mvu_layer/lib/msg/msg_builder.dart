@@ -1,4 +1,4 @@
-part of 'mvu_layer.dart';
+part of '../mvu_layer.dart';
 
 typedef MsgWidgetBuilder<Model, MsgConnector> = Widget Function(
     BuildContext, MsgConnector, Model);

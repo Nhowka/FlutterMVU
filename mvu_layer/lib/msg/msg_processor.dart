@@ -1,4 +1,4 @@
-part of 'mvu_layer.dart';
+part of '../mvu_layer.dart';
 
 /// Defines the behavior of the messages, taking a model and outputting a new
 /// model and optionally extra commands to send future messages

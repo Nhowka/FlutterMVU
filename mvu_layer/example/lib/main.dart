@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mvu_layer/mvu.dart';
 
-import './page/input_text/update.dart';
-import './page/input_text/view.dart';
+import './page/update.dart';
+import './page/view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Card(
-        child: MVUBuilder.withArg('Texto',
+        child: MVUBuilder(
             init: init,
             update: update,
             view: view),

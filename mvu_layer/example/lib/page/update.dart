@@ -18,7 +18,7 @@ import 'model.dart';
           input_text.update(inputTextMsg, state).map(InputText.new, InputTextMsg.new),
       (SwitchToCounter(), _) =>
           counter.init().map(Counter.new, CounterMsg.new),
-      (SwitchToInputText(), Counter(:var state)) =>
-        input_text.init(state.toString()).map(InputText.new, InputTextMsg.new),
+      (SwitchToInputText(), _) =>
+        input_text.init().map(InputText.new, InputTextMsg.new),
       _ => (currentPage, Cmd.none())
     };

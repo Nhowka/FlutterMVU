@@ -1,6 +1,10 @@
+# 0.3.0-dev.1
+
+- Experimental real MVU using features from Dart 3.
+
 # 0.2.4
 
-- Fix broken disposer of `MsgProvider. Offers an `onDispose` function instead.
+- Fix broken disposer of `MsgProvider`. Offers an `onDispose` function instead.
 
 # 0.2.3
 

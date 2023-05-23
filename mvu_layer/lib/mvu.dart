@@ -1,9 +1,3 @@
 library mvu;
 
-import 'dart:async';
-
-import 'package:flutter/widgets.dart';
-
-part 'mvu/mvu_processor.dart';
-part 'mvu/mvu_builder.dart';
-
+export 'src/mvu/mvu_builder.dart';

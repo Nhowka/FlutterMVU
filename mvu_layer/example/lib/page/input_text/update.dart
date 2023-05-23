@@ -2,7 +2,7 @@ import 'package:mvu_layer/mvu.dart';
 
 import 'model.dart';
 
-(InputTextState, Cmd<InputTextMsgType>) init(String initial) => (InputTextState(initial, false), Cmd.none());
+(InputTextState, Cmd<InputTextMsgType>) init() => (const InputTextState('', false), Cmd.none());
 
 (InputTextState, Cmd<InputTextMsgType>) update(InputTextMsgType msg, InputTextState state) =>
     switch (msg) {

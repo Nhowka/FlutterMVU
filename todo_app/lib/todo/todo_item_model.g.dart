@@ -41,25 +41,25 @@ class _$TodoItemSerializer implements StructuredSerializer<TodoItem> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'completed':
           result.completed = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
         case 'title':
           result.content = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'isEditing':
           result.isEditing = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -81,7 +81,7 @@ class _$TodoItem extends TodoItem {
   final Optional<void Function()> isDeleted;
 
   factory _$TodoItem([void Function(TodoItemBuilder)? updates]) =>
-      (new TodoItemBuilder()..update(updates)).build();
+      (new TodoItemBuilder()..update(updates))._build();
 
   _$TodoItem._(
       {required this.completed,
@@ -90,11 +90,11 @@ class _$TodoItem extends TodoItem {
       required this.isEditing,
       required this.isDeleted})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(completed, 'TodoItem', 'completed');
-    BuiltValueNullFieldError.checkNotNull(content, 'TodoItem', 'content');
-    BuiltValueNullFieldError.checkNotNull(id, 'TodoItem', 'id');
-    BuiltValueNullFieldError.checkNotNull(isEditing, 'TodoItem', 'isEditing');
-    BuiltValueNullFieldError.checkNotNull(isDeleted, 'TodoItem', 'isDeleted');
+    BuiltValueNullFieldError.checkNotNull(completed, r'TodoItem', 'completed');
+    BuiltValueNullFieldError.checkNotNull(content, r'TodoItem', 'content');
+    BuiltValueNullFieldError.checkNotNull(id, r'TodoItem', 'id');
+    BuiltValueNullFieldError.checkNotNull(isEditing, r'TodoItem', 'isEditing');
+    BuiltValueNullFieldError.checkNotNull(isDeleted, r'TodoItem', 'isDeleted');
   }
 
   @override
@@ -118,15 +118,19 @@ class _$TodoItem extends TodoItem {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc($jc($jc($jc(0, completed.hashCode), content.hashCode), id.hashCode),
-            isEditing.hashCode),
-        isDeleted.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, completed.hashCode);
+    _$hash = $jc(_$hash, content.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, isEditing.hashCode);
+    _$hash = $jc(_$hash, isDeleted.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('TodoItem')
+    return (newBuiltValueToStringHelper(r'TodoItem')
           ..add('completed', completed)
           ..add('content', content)
           ..add('id', id)
@@ -189,21 +193,23 @@ class TodoItemBuilder implements Builder<TodoItem, TodoItemBuilder> {
   }
 
   @override
-  _$TodoItem build() {
+  TodoItem build() => _build();
+
+  _$TodoItem _build() {
     final _$result = _$v ??
         new _$TodoItem._(
             completed: BuiltValueNullFieldError.checkNotNull(
-                completed, 'TodoItem', 'completed'),
+                completed, r'TodoItem', 'completed'),
             content: BuiltValueNullFieldError.checkNotNull(
-                content, 'TodoItem', 'content'),
-            id: BuiltValueNullFieldError.checkNotNull(id, 'TodoItem', 'id'),
+                content, r'TodoItem', 'content'),
+            id: BuiltValueNullFieldError.checkNotNull(id, r'TodoItem', 'id'),
             isEditing: BuiltValueNullFieldError.checkNotNull(
-                isEditing, 'TodoItem', 'isEditing'),
+                isEditing, r'TodoItem', 'isEditing'),
             isDeleted: BuiltValueNullFieldError.checkNotNull(
-                isDeleted, 'TodoItem', 'isDeleted'));
+                isDeleted, r'TodoItem', 'isDeleted'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

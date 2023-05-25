@@ -1,33 +1,28 @@
-import 'package:todoapp/all/all_messenger.dart';
 import 'package:todoapp/all/all_model.dart';
 import 'package:todoapp/counter/counter_model.dart';
-import 'package:mvu_layer/mvu_layer.dart';
+import 'package:mvu_layer/mvu.dart';
 
-class CounterMessenger extends MappedMessenger<AllMessenger, AllModel, CounterModel> {
-  CounterMessenger(AllMessenger parent) : super(parent, mapToChild, merge);
+sealed class CounterMsg {}
+class Increment implements CounterMsg {}
+class IncrementDelayed implements CounterMsg {}
+class Decrement implements CounterMsg {}
+class _IncrementDelayed implements CounterMsg {}
+class Reset implements CounterMsg {}
 
-  static Update<CounterModel> get init => Update(CounterModel());
+class CounterMessenger {
 
-  static CounterModel mapToChild(AllModel m) => m.counter;
+  static (CounterModel, Cmd<CounterMsg>) get init => (CounterModel(), Cmd.none());
 
-  static AllModel merge(AllModel m, CounterModel cm) =>
-      m.rebuild((b) => b.counter = cm.toBuilder());
-
-  void increment() => modelDispatcher(
-      (CounterModel model) => model.rebuild((b) => b.value = model.value + 1));
-
-  void incrementDelayed() => dispatcher((CounterModel model) => Update(
-      model.rebuild((b) => b.valueFuture = model.valueFuture + 1),
-      commands: Cmd.ofModelMsg(Future.delayed(
-          Duration(seconds: 5),
-          () => (CounterModel model) => model.rebuild((b) => b.valueFuture == 0
-              ? b
-              : (b
-                ..valueFuture = model.valueFuture - 1
-                ..value = model.value + 1))))));
-  void decrement() => modelDispatcher(
-      (CounterModel model) => model.rebuild((b) => b.value = model.value - 1));
-
-  @override
-  void reset() => dispatcher((_) => init);
+  static (CounterModel, Cmd<CounterMsg>) update(CounterMsg msg, CounterModel model) =>
+        switch (msg) {
+    Increment() => (model.rebuild((b) => b.value = model.value + 1), Cmd.none()),
+    IncrementDelayed() => (model.rebuild((b) => b.valueFuture = model.valueFuture + 1), Cmd.ofFunc(()=> Future.delayed(Duration(seconds: 5)), onMissing: _IncrementDelayed())),
+    Decrement() => (model.rebuild((b) => b.value = model.value - 1), Cmd.none()),
+    Reset() => init,
+    _IncrementDelayed() => (model.rebuild((b) => b.valueFuture == 0
+        ? b
+        : (b
+      ..valueFuture = model.valueFuture - 1
+      ..value = model.value + 1)), Cmd.none())
+        };
 }

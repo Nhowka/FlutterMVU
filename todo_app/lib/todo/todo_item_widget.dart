@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:mvu_layer/mvu.dart';
+import 'package:todoapp/todo/todo_item_messenger.dart';
+import 'package:todoapp/todo/todo_item_model.dart';
 
 class TodoItemWidget {
-  static Widget builder(context, messenger, item) => Row(
+  static Widget builder(context, TodoItem item, Dispatch<TodoItemMsg> dispatch) => Row(
       key: ValueKey<int>(item.id),
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -15,7 +17,7 @@ class TodoItemWidget {
               )),
               IconButton(
                 icon: Icon(Icons.undo),
-                onPressed: () => messenger.undoDelete(),
+                onPressed: () => dispatch(UndoDelete(item.id)),
               ),
             ]
           : [
@@ -23,8 +25,7 @@ class TodoItemWidget {
                   child: item.isEditing
                       ? TextFormField(
                           initialValue: item.content,
-                          onFieldSubmitted: (content) =>
-                              messenger.setContent(content),
+                          onFieldSubmitted: (content) => dispatch(SetContent(item.id,content)),
                         )
                       : Text(
                           item.content,
@@ -41,15 +42,16 @@ class TodoItemWidget {
                 if (!item.isEditing)
                   IconButton(
                     icon: Icon(Icons.edit),
-                    onPressed: () => messenger.startEdit(),
+                    onPressed: () => dispatch(StartEdit(item.id)),
                   ),
+                if (!item.isEditing)
                 IconButton(
                   icon: Icon(item.completed ? Icons.undo : Icons.check),
-                  onPressed: () => messenger.toggleComplete(),
+                  onPressed: () => dispatch(ToggleComplete(item.id)),
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () => messenger.queueDelete(),
+                  onPressed: () => dispatch(QueueDelete(item.id)),
                 ),
               ]),
             ]);

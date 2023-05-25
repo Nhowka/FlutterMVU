@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:mvu_layer/mvu.dart';
 import 'package:todoapp/all/all_messenger.dart';
 import 'package:todoapp/all/all_model.dart';
 import 'package:todoapp/counter/counter_widget.dart';
 import 'package:todoapp/todo/todo_widget.dart';
 
 class AllWidget {
-  static Widget builder(context, AllMessenger messenger, AllModel all) => Container(
+  static Widget builder(context, AllModel all, Dispatch<AllMsg> dispatch) =>
+      Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Padding(
@@ -16,21 +17,18 @@ class AllWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Expanded(
-                  child: (){
-                    switch(all.page){
-
-                      case Pages.COUNTER:
-                        return CounterWidget.builder(context, messenger.counterMessenger, all.counter);
-                      case Pages.TODO:
-                        return TodoWidget.builder(context, messenger.todoMessenger, all.todos);
-                    }
-                  }(),
+                  child: switch (all.page) {
+                    Pages.COUNTER => CounterWidget.builder(
+                        context, all.counter, dispatch.map(CMsg.new)),
+                    Pages.TODO => TodoWidget.builder(
+                        context, all.todos, dispatch.map(TMsg.new))
+                  },
                 ),
                 DropdownButton<Pages>(
                   key: ValueKey('DropdownButton'),
                   value: all.page,
                   icon: Icon(Icons.arrow_drop_down),
-                  onChanged: messenger.changePage,
+                  onChanged: (page) => dispatch(ChangePage(page)),
                   items: Pages.values
                       .map((e) => DropdownMenuItem(
                             key: ValueKey(e),

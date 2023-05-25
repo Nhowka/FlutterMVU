@@ -38,13 +38,13 @@ class _$AllModelSerializer implements StructuredSerializer<AllModel> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'page':
           result.page = serializers.deserialize(value,
-              specifiedType: const FullType(Pages)) as Pages;
+              specifiedType: const FullType(Pages))! as Pages;
           break;
         case 'todos':
           result.todos.replace(serializers.deserialize(value,
@@ -70,13 +70,13 @@ class _$AllModel extends AllModel {
   final CounterModel counter;
 
   factory _$AllModel([void Function(AllModelBuilder)? updates]) =>
-      (new AllModelBuilder()..update(updates)).build();
+      (new AllModelBuilder()..update(updates))._build();
 
   _$AllModel._({required this.page, required this.todos, required this.counter})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(page, 'AllModel', 'page');
-    BuiltValueNullFieldError.checkNotNull(todos, 'AllModel', 'todos');
-    BuiltValueNullFieldError.checkNotNull(counter, 'AllModel', 'counter');
+    BuiltValueNullFieldError.checkNotNull(page, r'AllModel', 'page');
+    BuiltValueNullFieldError.checkNotNull(todos, r'AllModel', 'todos');
+    BuiltValueNullFieldError.checkNotNull(counter, r'AllModel', 'counter');
   }
 
   @override
@@ -97,13 +97,17 @@ class _$AllModel extends AllModel {
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, page.hashCode), todos.hashCode), counter.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, page.hashCode);
+    _$hash = $jc(_$hash, todos.hashCode);
+    _$hash = $jc(_$hash, counter.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('AllModel')
+    return (newBuiltValueToStringHelper(r'AllModel')
           ..add('page', page)
           ..add('todos', todos)
           ..add('counter', counter))
@@ -154,13 +158,15 @@ class AllModelBuilder implements Builder<AllModel, AllModelBuilder> {
   }
 
   @override
-  _$AllModel build() {
+  AllModel build() => _build();
+
+  _$AllModel _build() {
     _$AllModel _$result;
     try {
       _$result = _$v ??
           new _$AllModel._(
               page: BuiltValueNullFieldError.checkNotNull(
-                  page, 'AllModel', 'page'),
+                  page, r'AllModel', 'page'),
               todos: todos.build(),
               counter: counter.build());
     } catch (_) {
@@ -172,7 +178,7 @@ class AllModelBuilder implements Builder<AllModel, AllModelBuilder> {
         counter.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'AllModel', _$failedField, e.toString());
+            r'AllModel', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -181,4 +187,4 @@ class AllModelBuilder implements Builder<AllModel, AllModelBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

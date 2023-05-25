@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:mvu_layer/mvu.dart';
 import 'package:todoapp/todo/todo_filter.dart';
 import 'package:todoapp/todo/todo_item_widget.dart';
 import 'package:todoapp/todo/todo_model.dart';
@@ -9,7 +9,7 @@ import 'package:todoapp/todo/todos_messenger.dart';
 class TodoWidget {
  static final controller = TextEditingController();
  static final search = TextEditingController();
-  static Widget builder(context, TodoMessenger messenger, TodoModel model) {
+  static Widget builder(context, TodoModel model, Dispatch<TodoMsg> dispatch) {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -28,7 +28,7 @@ class TodoWidget {
                     controller: controller,
                     onFieldSubmitted: (content) {
                       controller.clear();
-                      messenger.addTodo(content);
+                      dispatch(AddTodo(content));
                     },
                     decoration:
                         InputDecoration(hintText: "Add something to do"),
@@ -37,25 +37,24 @@ class TodoWidget {
                     child: ListView(
                       children: <Widget>[
                         ...(model.filtered.map((item) => TodoItemWidget.builder(
-                            context, messenger.itemMessenger(item.id), item)))
+                            context, item, dispatch.map(TIMsg.new))))
                       ],
                     ),
                   ),
                   Text("${model.notCompleted.length} remaining"),
                   TextFormField(
                     controller: search,
-                    onChanged: messenger.setSearch,
+                    onChanged: dispatch.map(SetSearch.new),
                     decoration: InputDecoration(hintText: "Search items"),
                   ),
                   TodoFilter.builder(
                     context,
                     model,
                     "Filter:",
-                    messenger.setFilter,
+                    dispatch.map(SetFilter.new),
                     true,
                   ),
-                  TodoFilter.builder(context, model, "Clear:",
-                      messenger.clearByFilter, false),
+                  TodoFilter.builder(context, model, "Clear:",dispatch.map(ClearByFilter.new), false),
                 ]),
     );
   }

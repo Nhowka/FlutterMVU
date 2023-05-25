@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:mvu_layer/mvu.dart';
 import 'package:todoapp/counter/counter_messenger.dart';
 import 'package:todoapp/counter/counter_model.dart';
 
 class CounterWidget {
-  static Widget builder (context, CounterMessenger messenger, CounterModel model) => Column(
+  static Widget builder (context, CounterModel model, Dispatch<CounterMsg> dispatch) => Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
@@ -17,10 +17,10 @@ class CounterWidget {
           Text('Value to be incremented: ${model.valueFuture}'),
         ],
       Spacer(flex: 3),
-      TextButton(child: Text('Increment'), onPressed: messenger.increment,),
-      TextButton(child: Text('Increment delayed'), onPressed: messenger.incrementDelayed,),
-      TextButton(child: Text('Decrement'), onPressed: messenger.decrement,),
-      TextButton(child: Text('Reset'), onPressed: messenger.reset,),
+      TextButton(child: Text('Increment'), onPressed: () => dispatch(Increment()),),
+      TextButton(child: Text('Increment delayed'), onPressed: () => dispatch(IncrementDelayed()),),
+      TextButton(child: Text('Decrement'), onPressed: () => dispatch(Decrement()),),
+      TextButton(child: Text('Reset'), onPressed: () => dispatch(Reset()),),
       Spacer(flex: 2),
     ],
   );

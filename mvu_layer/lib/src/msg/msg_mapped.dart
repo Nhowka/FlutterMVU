@@ -1,4 +1,4 @@
-part of 'mvu_layer.dart';
+part of '../../mvu_layer.dart';
 
 typedef ToChild<Model, ChildModel> = ChildModel Function(Model);
 typedef Merger<Model, ChildModel> = Model Function(Model, ChildModel);
@@ -95,4 +95,14 @@ abstract class MappedMessenger<T extends Messenger<Model>, Model, ChildModel>
               onErrorModel: onErrorModel,
               onErrorCommands: onErrorCommands,
               doRebuild: doRebuild)));
+
+  /// Extract a future value mapped from the model
+  Future<T> extract<T>(T Function(ChildModel) extractFunction) {
+    final Completer<T> completer = Completer<T>();
+    doWithModel((model) => completer.complete(extractFunction(model)));
+    return completer.future;
+  }
+
+  /// Recover the latest model in a async getter
+  Future<ChildModel> get model => extract((model) => model);
 }

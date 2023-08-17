@@ -37,17 +37,17 @@ class _$CounterModelSerializer implements StructuredSerializer<CounterModel> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'value':
           result.value = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'valueFuture':
           result.valueFuture = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
       }
     }
@@ -63,13 +63,13 @@ class _$CounterModel extends CounterModel {
   final int valueFuture;
 
   factory _$CounterModel([void Function(CounterModelBuilder)? updates]) =>
-      (new CounterModelBuilder()..update(updates)).build();
+      (new CounterModelBuilder()..update(updates))._build();
 
   _$CounterModel._({required this.value, required this.valueFuture})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(value, 'CounterModel', 'value');
+    BuiltValueNullFieldError.checkNotNull(value, r'CounterModel', 'value');
     BuiltValueNullFieldError.checkNotNull(
-        valueFuture, 'CounterModel', 'valueFuture');
+        valueFuture, r'CounterModel', 'valueFuture');
   }
 
   @override
@@ -89,12 +89,16 @@ class _$CounterModel extends CounterModel {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, value.hashCode), valueFuture.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, value.hashCode);
+    _$hash = $jc(_$hash, valueFuture.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('CounterModel')
+    return (newBuiltValueToStringHelper(r'CounterModel')
           ..add('value', value)
           ..add('valueFuture', valueFuture))
         .toString();
@@ -139,16 +143,18 @@ class CounterModelBuilder
   }
 
   @override
-  _$CounterModel build() {
+  CounterModel build() => _build();
+
+  _$CounterModel _build() {
     final _$result = _$v ??
         new _$CounterModel._(
             value: BuiltValueNullFieldError.checkNotNull(
-                value, 'CounterModel', 'value'),
+                value, r'CounterModel', 'value'),
             valueFuture: BuiltValueNullFieldError.checkNotNull(
-                valueFuture, 'CounterModel', 'valueFuture'));
+                valueFuture, r'CounterModel', 'valueFuture'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

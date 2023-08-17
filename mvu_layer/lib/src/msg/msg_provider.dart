@@ -1,4 +1,4 @@
-part of 'mvu_layer.dart';
+part of '../../mvu_layer.dart';
 
 typedef MessengerCreator<Model> = Messenger<Model> Function(
     MsgProcessor<Model>);
@@ -56,6 +56,16 @@ abstract class Messenger<Model> {
   void dispose() {
     _processor.dispose();
   }
+
+  /// Extract a future value mapped from the model
+  Future<T> extract<T>(T Function(Model) extractFunction) {
+    final Completer<T> completer = Completer<T>();
+    doWithModel((model) => completer.complete(extractFunction(model)));
+    return completer.future;
+  }
+
+  /// Recover the latest model in a async getter
+  Future<Model> get model => extract((model) => model);
 
   /// Dispatch a message that just returns the new model from the old model
   void modelDispatcher(

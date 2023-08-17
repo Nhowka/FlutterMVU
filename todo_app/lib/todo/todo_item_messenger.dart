@@ -1,54 +1,112 @@
 import 'package:optional/optional_internal.dart';
-import 'package:mvu_layer/mvu_layer.dart';
-import 'package:todoapp/todo/todos_messenger.dart';
+import 'package:mvu_layer/mvu.dart';
+import 'package:async/async.dart';
 import 'package:todoapp/todo/todo_item_model.dart';
 import 'package:todoapp/todo/todo_model.dart';
 
-class TodoItemMessenger
-    extends MappedMessenger<TodoMessenger, TodoModel, TodoItem?> {
-  TodoItemMessenger(TodoMessenger original, int id)
-      : super(original, mapToChild(id), merge(id));
+sealed class TodoItemMsg {
+  final int id;
 
-  static ToChild<TodoModel, TodoItem?> mapToChild(id) =>
-      (model) => model.items.firstWhere((e) => e.id == id);
+  TodoItemMsg(this.id);
+}
 
-  static Merger<TodoModel, TodoItem?> merge(int id) =>
-      (model, item) => model.rebuild((t) {
-            if (item == null) {
-              t.items.removeWhere((i) => i.id == id);
-            } else {
-              t.items.map((original) => original.id == id ? item : original);
-            }
-          });
+class QueueDelete implements TodoItemMsg {
+  final int id;
 
-  // Implements the message with behaviour to queue a delete items by id
-  void queueDelete() => dispatcher((TodoItem? model) => Update(model,
-      commands: Cmd.ofCancelableModelMsg(
-          cancellableMsg: (cancel) => (TodoItem? model) =>
-              model?.rebuild((b) => b.isDeleted = Optional.of(cancel)),
-          onComplete: Future.delayed(Duration(seconds: 4), () => (TodoItem? model) => null),
-          onCancel: (TodoItem? model) =>
-              model?.rebuild((ib) => ib.isDeleted = Optional.empty()))));
+  QueueDelete(this.id);
+}
 
+class Delete implements TodoItemMsg {
+  final int id;
 
-  // Implements the message with behaviour to cancel an item deletion
-  void undoDelete() =>
-      doWithModel((TodoItem? model) => model?.isDeleted.ifPresent((c) => c()));
+  Delete(this.id);
+}
 
-  // Implements the message with behaviour to change the completion state of the item
-  void toggleComplete() => modelDispatcher(
-      (model) => model?.rebuild((ib) => ib.completed = ib.completed != true));
+class UndoDelete implements TodoItemMsg {
+  final int id;
 
-  // Implements the message with behaviour to start editing an item
-  void startEdit() =>
-      modelDispatcher((model) => model?.rebuild((ib) => ib.isEditing = true));
+  UndoDelete(this.id);
+}
 
-  // Implements the message with behaviour to finish editing and setting the item's content
-  void setContent(String content) =>
-      modelDispatcher((TodoItem? model) => model?.rebuild((ib) => ib
-        ..isEditing = false
-        ..content = content));
+class ToggleComplete implements TodoItemMsg {
+  final int id;
 
-  @override
-  void reset() {}
+  ToggleComplete(this.id);
+}
+
+class StartEdit implements TodoItemMsg {
+  final int id;
+
+  StartEdit(this.id);
+}
+
+class SetContent implements TodoItemMsg {
+  final int id;
+  final String content;
+
+  SetContent(this.id, this.content);
+}
+
+class _SetCancellation implements TodoItemMsg {
+  final int id;
+  final void Function() cancel;
+
+  _SetCancellation(this.id, this.cancel);
+}
+
+class _Cancell implements TodoItemMsg {
+  final int id;
+
+  _Cancell(this.id);
+}
+
+class TodoItemMessenger {
+  static (TodoItem, Cmd<TodoItemMsg>) init(int id, String content) => (
+        TodoItem((b) => b
+          ..id = id
+          ..content = content),
+        Cmd.none()
+      );
+
+  static (TodoItem, Cmd<TodoItemMsg>) update(TodoItemMsg msg, TodoItem item) =>
+      switch (msg) {
+        QueueDelete(:var id) => (
+            item,
+            Cmd.ofEffect((dispatch) async {
+              final cancellable = CancelableOperation<TodoItemMsg>.fromFuture(
+                  Future.delayed(Duration(seconds: 4), () => Delete(id)));
+              dispatch(_SetCancellation(id, cancellable.cancel));
+              final r = await cancellable.valueOrCancellation(_Cancell(id));
+              if (r != null) {
+                dispatch(r);
+              }
+            })
+          ),
+        _Cancell() => (
+            item.rebuild((p0) => p0.isDeleted = Optional.empty()),
+            Cmd.none()
+          ),
+        _SetCancellation(:var cancel) => (
+            item.rebuild((p0) => p0.isDeleted = Optional.of(cancel)),
+            Cmd.none()
+          ),
+        UndoDelete() => (
+            item,
+            Cmd.ofEffect((_) => item.isDeleted.ifPresent((c) => c()))
+          ),
+        ToggleComplete() => (
+            item.rebuild((ib) => ib.completed = ib.completed != true),
+            Cmd.none()
+          ),
+        StartEdit() => (item.rebuild((ib) => ib.isEditing = true), Cmd.none()),
+        SetContent(:var content) => (
+            item.rebuild((ib) => ib
+              ..isEditing = false
+              ..content = content),
+            Cmd.none()
+          ),
+        Delete() =>
+          // Captured on the parent
+          (item, Cmd.none())
+      };
 }

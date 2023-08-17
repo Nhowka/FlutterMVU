@@ -45,7 +45,7 @@ class _$TodoModelSerializer implements StructuredSerializer<TodoModel> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -53,23 +53,23 @@ class _$TodoModelSerializer implements StructuredSerializer<TodoModel> {
           result.items.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(TodoItem)]))!
-              as BuiltList<Object>);
+              as BuiltList<Object?>);
           break;
         case 'loadingExternal':
           result.loadingExternal = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
         case 'nextId':
           result.nextId = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'filter':
           result.filter = serializers.deserialize(value,
-              specifiedType: const FullType(Filter)) as Filter;
+              specifiedType: const FullType(Filter))! as Filter;
           break;
         case 'search':
           result.search = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -91,7 +91,7 @@ class _$TodoModel extends TodoModel {
   final String search;
 
   factory _$TodoModel([void Function(TodoModelBuilder)? updates]) =>
-      (new TodoModelBuilder()..update(updates)).build();
+      (new TodoModelBuilder()..update(updates))._build();
 
   _$TodoModel._(
       {required this.items,
@@ -100,12 +100,12 @@ class _$TodoModel extends TodoModel {
       required this.filter,
       required this.search})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(items, 'TodoModel', 'items');
+    BuiltValueNullFieldError.checkNotNull(items, r'TodoModel', 'items');
     BuiltValueNullFieldError.checkNotNull(
-        loadingExternal, 'TodoModel', 'loadingExternal');
-    BuiltValueNullFieldError.checkNotNull(nextId, 'TodoModel', 'nextId');
-    BuiltValueNullFieldError.checkNotNull(filter, 'TodoModel', 'filter');
-    BuiltValueNullFieldError.checkNotNull(search, 'TodoModel', 'search');
+        loadingExternal, r'TodoModel', 'loadingExternal');
+    BuiltValueNullFieldError.checkNotNull(nextId, r'TodoModel', 'nextId');
+    BuiltValueNullFieldError.checkNotNull(filter, r'TodoModel', 'filter');
+    BuiltValueNullFieldError.checkNotNull(search, r'TodoModel', 'search');
   }
 
   @override
@@ -128,17 +128,19 @@ class _$TodoModel extends TodoModel {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc($jc($jc(0, items.hashCode), loadingExternal.hashCode),
-                nextId.hashCode),
-            filter.hashCode),
-        search.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, items.hashCode);
+    _$hash = $jc(_$hash, loadingExternal.hashCode);
+    _$hash = $jc(_$hash, nextId.hashCode);
+    _$hash = $jc(_$hash, filter.hashCode);
+    _$hash = $jc(_$hash, search.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('TodoModel')
+    return (newBuiltValueToStringHelper(r'TodoModel')
           ..add('items', items)
           ..add('loadingExternal', loadingExternal)
           ..add('nextId', nextId)
@@ -202,20 +204,22 @@ class TodoModelBuilder implements Builder<TodoModel, TodoModelBuilder> {
   }
 
   @override
-  _$TodoModel build() {
+  TodoModel build() => _build();
+
+  _$TodoModel _build() {
     _$TodoModel _$result;
     try {
       _$result = _$v ??
           new _$TodoModel._(
               items: items.build(),
               loadingExternal: BuiltValueNullFieldError.checkNotNull(
-                  loadingExternal, 'TodoModel', 'loadingExternal'),
+                  loadingExternal, r'TodoModel', 'loadingExternal'),
               nextId: BuiltValueNullFieldError.checkNotNull(
-                  nextId, 'TodoModel', 'nextId'),
+                  nextId, r'TodoModel', 'nextId'),
               filter: BuiltValueNullFieldError.checkNotNull(
-                  filter, 'TodoModel', 'filter'),
+                  filter, r'TodoModel', 'filter'),
               search: BuiltValueNullFieldError.checkNotNull(
-                  search, 'TodoModel', 'search'));
+                  search, r'TodoModel', 'search'));
     } catch (_) {
       late String _$failedField;
       try {
@@ -223,7 +227,7 @@ class TodoModelBuilder implements Builder<TodoModel, TodoModelBuilder> {
         items.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'TodoModel', _$failedField, e.toString());
+            r'TodoModel', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -232,4 +236,4 @@ class TodoModelBuilder implements Builder<TodoModel, TodoModelBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

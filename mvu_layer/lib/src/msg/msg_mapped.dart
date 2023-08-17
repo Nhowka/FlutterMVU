@@ -1,4 +1,4 @@
-part of '../mvu_layer.dart';
+part of '../../mvu_layer.dart';
 
 typedef ToChild<Model, ChildModel> = ChildModel Function(Model);
 typedef Merger<Model, ChildModel> = Model Function(Model, ChildModel);

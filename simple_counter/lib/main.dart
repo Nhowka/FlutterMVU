@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mvu_layer/mvu.dart';
 
 void main() {
+  test();
   runApp(MyApp());
 }
 
@@ -29,6 +31,20 @@ class HomeModel {
   HomeModel copyWith({title, counter}) =>
       HomeModel(title: title ?? this.title, counter: counter ?? this.counter);
 }
+
+void test(){
+  print('In all cases');
+  printToConsole('In redirected case');
+  if (kDebugMode) {
+    print('In debug case');
+  }
+}
+void printToConsole(dynamic input) {
+  if (kDebugMode) {
+    print(input);
+  }
+}
+
 
 sealed class HomeMsg {}
 

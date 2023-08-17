@@ -1,4 +1,4 @@
-part of '../mvu_layer.dart';
+part of '../../mvu_layer.dart';
 
 typedef MessengerCreator<Model> = Messenger<Model> Function(
     MsgProcessor<Model>);

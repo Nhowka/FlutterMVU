@@ -5,13 +5,17 @@ import 'dart:convert';
 import 'package:todoapp/todo/todo_item_model.dart';
 
 class LoadTodoService {
-  Future<BuiltList<TodoItem>> loadTodos() async {
-    final response =
-        await http.get(Uri.parse('https://jsonplaceholder.cypress.io/users/1/todos'));
+  Future<List<TodoItem>> loadTodos() async {
+    final response = await http
+        .get(Uri.parse('https://jsonplaceholder.cypress.io/users/1/todos'));
     final jsonBody = response.body;
     final parsed = jsonDecode(jsonBody);
-    return BuiltList<TodoItem>(
-      parsed.map((e) => TodoItem.fromJson(e as Map<String, dynamic>)!).toList(),
-    );
+    if (parsed is List) {
+      return parsed
+          .map((e) => TodoItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else {
+      return [];
+    }
   }
 }

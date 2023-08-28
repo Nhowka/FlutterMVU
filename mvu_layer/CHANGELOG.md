@@ -1,3 +1,7 @@
+# 0.3.1
+
+- Add widget classes [MVUWidget] and [MVUWidgetWithTicker] to simplify the implementation of MVU widgets that might need single init dependencies. These dependencies should be final fields and can be accessed from the init and update function without polluting the model or requiring a closure. 
+
 # 0.3.0
 
 - Almost a complete reimplementation of the elmish structure, but still dartish.

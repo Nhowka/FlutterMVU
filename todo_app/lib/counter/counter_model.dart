@@ -1,22 +1,13 @@
-import 'package:built_value/built_value.dart';
-import 'package:built_value/serializer.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'counter_model.g.dart';
+part 'counter_model.freezed.dart';
 
+@freezed
 
-
-abstract class CounterModel implements Built<CounterModel, CounterModelBuilder> {
-  static Serializer<CounterModel> get serializer => _$counterModelSerializer;
-
-  static void _initializeBuilder(CounterModelBuilder builder) => builder
-    ..value = 0
-    ..valueFuture = 0;
-
-
-  int get value;
-  int get valueFuture;
-
-
-  CounterModel._();
-  factory CounterModel([void Function(CounterModelBuilder) updates]) = _$CounterModel;
+class CounterModel with _$CounterModel {
+  const CounterModel._();
+  const factory CounterModel({
+    @Default(0) int value,
+    @Default(0) int valueFuture,
+  }) = _CounterModel;
 }

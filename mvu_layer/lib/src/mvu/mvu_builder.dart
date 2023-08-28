@@ -77,6 +77,57 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
   State<MVUBuilder<Model, Msg>> createState() => _MVUBuilderState(_processor);
 }
 
+class _MVUWidgetElement<Model, Msg> extends ComponentElement {
+  _MVUWidgetElement(MVUWidget<Model, Msg> super.widget);
+
+  @override
+  Widget build() {
+    final builder = widget as MVUWidget<Model, Msg>;
+    return MVUBuilder(
+        init: builder.init, update: builder.update, view: builder.build);
+  }
+}
+
+class _MVUWidgetElementWithTicker<Model, Msg> extends ComponentElement {
+  _MVUWidgetElementWithTicker(MVUWidgetWithTicker<Model, Msg> super.widget);
+
+  @override
+  Widget build() {
+    final builder = widget as MVUWidgetWithTicker<Model, Msg>;
+    return MVUBuilder.withTickerProvider(
+        init: builder.init, update: builder.update, view: builder.build);
+  }
+}
+
+/// This widget exposes the MVU as base class for scenarios where
+/// the MVUBuilder is not suitable. For example, when the widget
+/// has local dependencies that are not part of the model. In this
+/// case, the widget can extend this class and implement the
+/// abstract methods.
+abstract class MVUWidget<Model, Msg> extends Widget {
+  const MVUWidget({super.key});
+
+  @override
+  Element createElement() => _MVUWidgetElement<Model, Msg>(this);
+
+  Widget build(BuildContext context, Model model, Dispatch<Msg> dispatch);
+  (Model, Cmd<Msg>) update(Msg msg, Model model);
+  (Model, Cmd<Msg>) init();
+}
+
+/// Same as [MVUWidget] but with a [TickerProvider] for animations.
+abstract class MVUWidgetWithTicker<Model, Msg> extends Widget {
+  const MVUWidgetWithTicker({super.key});
+
+  @override
+  Element createElement() => _MVUWidgetElementWithTicker<Model, Msg>(this);
+
+  Widget build(BuildContext context, TickerProvider tickerProvider, Model model,
+      Dispatch<Msg> dispatch);
+  (Model, Cmd<Msg>) update(Msg msg, Model model);
+  (Model, Cmd<Msg>) init();
+}
+
 /// State for [MVUBuilder].
 class _MVUBuilderState<Model, Msg> extends State<MVUBuilder<Model, Msg>>
     with TickerProviderStateMixin {

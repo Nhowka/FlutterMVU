@@ -1,13 +1,19 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:todoapp/all/all_model.dart';
 import 'package:todoapp/counter/counter_model.dart';
 import 'package:mvu_layer/mvu.dart';
 
-sealed class CounterMsg {}
-class Increment implements CounterMsg {}
-class IncrementDelayed implements CounterMsg {}
-class Decrement implements CounterMsg {}
-class _IncrementDelayed implements CounterMsg {}
-class Reset implements CounterMsg {}
+part 'counter_messenger.freezed.dart';
+
+@freezed
+sealed class CounterMsg with _$CounterMsg {
+  const factory CounterMsg.increment() = Increment;
+  const factory CounterMsg.incrementDelayed() = IncrementDelayed;
+  const factory CounterMsg.decrement() = Decrement;
+  const factory CounterMsg.reset() = Reset;
+  const factory CounterMsg.incrementedDelayed() = _IncrementDelayed;
+
+}
 
 class CounterMessenger {
 
@@ -15,14 +21,11 @@ class CounterMessenger {
 
   static (CounterModel, Cmd<CounterMsg>) update(CounterMsg msg, CounterModel model) =>
         switch (msg) {
-    Increment() => (model.rebuild((b) => b.value = model.value + 1), Cmd.none()),
-    IncrementDelayed() => (model.rebuild((b) => b.valueFuture = model.valueFuture + 1), Cmd.ofFunc(()=> Future.delayed(Duration(seconds: 5)), onMissing: _IncrementDelayed())),
-    Decrement() => (model.rebuild((b) => b.value = model.value - 1), Cmd.none()),
+    Increment() => (model.copyWith(value: model.value + 1), Cmd.none()),
+    IncrementDelayed() => (model.copyWith(valueFuture: model.valueFuture + 1), Cmd.ofFunc(()=> Future.delayed(Duration(seconds: 5)), onMissing: _IncrementDelayed())),
+    Decrement() => (model.copyWith(value: model.value - 1), Cmd.none()),
     Reset() => init,
-    _IncrementDelayed() => (model.rebuild((b) => b.valueFuture == 0
-        ? b
-        : (b
-      ..valueFuture = model.valueFuture - 1
-      ..value = model.value + 1)), Cmd.none())
+    _IncrementDelayed() => (model.valueFuture == 0? model : model.copyWith(valueFuture: model.valueFuture - 1,
+      value: model.value + 1), Cmd.none())
         };
 }

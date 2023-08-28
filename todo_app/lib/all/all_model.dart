@@ -1,25 +1,18 @@
-import 'package:built_value/built_value.dart';
-import 'package:built_value/serializer.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:todoapp/counter/counter_model.dart';
 import 'package:todoapp/todo/todo_model.dart';
 
-import '../todo/service/load_todos_service.dart';
-
-part 'all_model.g.dart';
+part 'all_model.freezed.dart';
 
 enum Pages { COUNTER, TODO }
 
-abstract class AllModel implements Built<AllModel, AllModelBuilder> {
-  static Serializer<AllModel> get serializer => _$allModelSerializer;
+@freezed
+class AllModel with _$AllModel {
+  const AllModel._();
 
-  static void _initializeBuilder(AllModelBuilder builder) => builder
-    ..counter = CounterModel().toBuilder()
-    ..todos = TodoModel().toBuilder()
-    ..page = Pages.COUNTER;
-  Pages get page;
-  TodoModel get todos;
-  CounterModel get counter;
-
-  AllModel._();
-  factory AllModel([void Function(AllModelBuilder) updates]) = _$AllModel;
+  const factory AllModel({
+    @Default(Pages.COUNTER) Pages page,
+    @Default(TodoModel()) TodoModel todos,
+    @Default(CounterModel()) CounterModel counter,
+  }) = _AllModel;
 }

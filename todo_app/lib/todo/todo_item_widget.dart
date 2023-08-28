@@ -8,7 +8,7 @@ class TodoItemWidget {
       key: ValueKey<int>(item.id),
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: item.isDeleted.isPresent
+      children: item.isDeleted != null
           ? [
               Expanded(
                   child: Text(

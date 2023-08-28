@@ -13,9 +13,6 @@ class TodoApp extends StatelessWidget {
 
   TodoApp({required LoadTodoService service}) : _service = service;
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,7 +23,6 @@ class TodoApp extends StatelessWidget {
         home: Scaffold(
             appBar:
                 AppBar(backgroundColor: Colors.lightGreen, title: Text("=)")),
-            body: MVUBuilder.withArg(_service, init: AllMessenger.init, update: AllMessenger.update, view: AllWidget.builder)
-            ));
+            body: AllWidget(_service)));
   }
 }

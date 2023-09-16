@@ -123,6 +123,75 @@ Widget example = MVUBuilder(
 
 There is also some different constructor for cases where you would need an argument for the `init` and a `TickerProvider` on the view. Keep tuned for better documentation on the future.
 
+# Since 0.3.2
+
+This update added subscriptions, new widgets
+
+## MVU Widgets
+
+There is also some widgets that can be used to make the development easier. They are not required, but they can help you to avoid some boilerplate code.
+
+### MVUWidget/MVUWidgetWithTicker
+
+The `MVUWidget` is a widget for subclassing that will need to implement `init`, `view` and `update` functions. It will also receive the `Model` and `Msg` types so the compiler can guarantee the type-safety of our functions.
+The `MVUWidgetWithTicker` is the same as the `MVUWidget`, but it will also receive a `TickerProvider` as an argument on the `view` that can be used to create `AnimationController` and other `Ticker` objects.
+
+### MVUProviderWidget/MVUContext
+
+The `MVUProviderWidget` is MVU widget that doesn't need a view at this moment. This is used to add a `MVU` to the widget tree and to be able to dispatch messages from the [MVUContext] children widgets. With that you can reuse a MVU in different parts of the widget tree and dispatch messages from anywhere in the widget tree.
+
+### MVUProvider
+
+Same as `MVUProviderWidget`, but you don't need to subclass it. You can create it passing the functions `init`, `update`, and optionally `onInit` and `onDispose`.
+- `onInit` is a function that will be called when the Widget is created. It will receive the `Dispatch<Msg>` function so you can send messages on initialization.
+- `onDispose` is a function that will be called when the Widget is disposed. It will receive the `Dispatch<Msg>` function so you can send messages on disposal.
+
+## Subscriptions
+
+Along the `init` and `update` functions, we can now also have the `subscriptions`. This function uses the `Model` and return a list of `(List<String>, Function () Function(Dispatch<Msg> dispatch))`. This big signature is read as:
+- A list of strings that will be used to identify the subscription. This is used to avoid duplicate subscriptions.
+- A function that will receive a `Dispatch<Msg>` function and will return a function that will cancel the subscription.
+
+For every model change, the `subscriptions` function will be called again, and the subscriptions will be updated. If there is a new identifier, the subscription will be added. If there is a identifier that is not in the new list, the subscription will be canceled, calling the function that was returned.
+But you don't need to always remember how to implement this. In the future, there will be some helper functions to make it easier to create subscriptions. For now there is three:
+- Sub.fromStream: This will create a subscription from a stream. It will use the `Stream.listen` function to subscribe to the stream, and it will return a function that will cancel the subscription. You will need to provide the list of strings for the identifiers, the stream and a mapping function that can return messages from the stream objects.
+- Sub.fromStreamMsg: This is the same as the `Sub.fromStream`, but the stream already returns messages.
+- Sub.fromFuture: This will create a subscription from a future. You will need to provide the list of strings for the identifiers, the future and a mapping function that can return messages from the future object.
+
+### Full example
+
+```dart
+class CounterProvider extends MVUProviderWidget<CounterState, CounterMsgType> {
+  const CounterProvider({super.key, required super.child});
+
+  @override
+  Subs<CounterMsgType> subscriptions(CounterState model) => [
+        if (model.timer)
+          (
+            ["timer-100"],
+            (dispatch) {
+              return Timer.periodic(const Duration(milliseconds: 100), (timer) {
+                dispatch(const Increment());
+              }).cancel;
+            }
+          )
+      ];
+
+  @override
+  (CounterState, Cmd<CounterMsgType>) init() =>
+      (const CounterState(count: 0, timer: false), Cmd.none());
+
+  @override
+  (CounterState, Cmd<CounterMsgType>) update(
+          CounterMsgType msg, CounterState model) =>
+      switch (msg) {
+        ToggleTimer() => (model.copyWith(timer: !model.timer), Cmd.none()),
+        Increment() => (model.copyWith(count: model.count + 1), Cmd.none()),
+        Decrement() => (model.copyWith(count: model.count - 1), Cmd.none())
+      };
+}
+```
+
 # 0.2.0 legacy readme
 The following part is about the legacy 0.2.0 version of the library. It's still valid, and I'm keeping it here for historical reasons. The new version is much more Elmish and uses the Dart 3.0 features to make the knowledge transferable.
 

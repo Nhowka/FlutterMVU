@@ -21,6 +21,15 @@ Widget view(BuildContext context, CounterState state,
               onPressed: () => dispatch(const Decrement()),
               child: const Text('Decrement')),
         ]),
-        Text('${state.count}', key: const ValueKey('Counter'))
+        Text('${state.count}', key: const ValueKey('Counter')),
+        Center(
+          child: TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: state.timer ? Colors.red : Colors.green,
+            ),
+            onPressed: () => dispatch(const ToggleTimer()),
+            child: const Text('Toggle timer'),
+          ),
+        )
       ],
     );

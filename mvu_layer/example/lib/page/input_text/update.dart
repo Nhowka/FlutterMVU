@@ -2,10 +2,15 @@ import 'package:mvu_layer/mvu.dart';
 
 import 'model.dart';
 
-(InputTextState, Cmd<InputTextMsgType>) init() => (const InputTextState('', false), Cmd.none());
+class InputTextProcessor extends MVUProcessor<InputTextState, InputTextMsgType> {
 
-(InputTextState, Cmd<InputTextMsgType>) update(InputTextMsgType msg, InputTextState state) =>
-    switch (msg) {
-      InputTextChanged(:var value) => (state.copyWith(inputText: value), Cmd.none()),
-      UppercaseToggled(:var value) => (state.copyWith(isUpperCase: value), Cmd.none())
-    };
+  @override
+  (InputTextState, Cmd<InputTextMsgType>) init() => (const InputTextState('', false), Cmd.none());
+
+  @override
+  (InputTextState, Cmd<InputTextMsgType>) update(InputTextMsgType msg, InputTextState model) =>
+      switch (msg) {
+        InputTextChanged(:var value) => (model.copyWith(inputText: value), Cmd.none()),
+        UppercaseToggled(:var value) => (model.copyWith(isUpperCase: value), Cmd.none())
+      };
+}

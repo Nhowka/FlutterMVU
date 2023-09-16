@@ -16,23 +16,22 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$AppPage {
-  Object get state => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(CounterState state) counter,
-    required TResult Function(InputTextState state) inputText,
+    required TResult Function() counter,
+    required TResult Function() inputText,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterState state)? counter,
-    TResult? Function(InputTextState state)? inputText,
+    TResult? Function()? counter,
+    TResult? Function()? inputText,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterState state)? counter,
-    TResult Function(InputTextState state)? inputText,
+    TResult Function()? counter,
+    TResult Function()? inputText,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -78,10 +77,6 @@ class _$AppPageCopyWithImpl<$Res, $Val extends AppPage>
 abstract class _$$CounterCopyWith<$Res> {
   factory _$$CounterCopyWith(_$Counter value, $Res Function(_$Counter) then) =
       __$$CounterCopyWithImpl<$Res>;
-  @useResult
-  $Res call({CounterState state});
-
-  $CounterStateCopyWith<$Res> get state;
 }
 
 /// @nodoc
@@ -90,86 +85,54 @@ class __$$CounterCopyWithImpl<$Res>
     implements _$$CounterCopyWith<$Res> {
   __$$CounterCopyWithImpl(_$Counter _value, $Res Function(_$Counter) _then)
       : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? state = null,
-  }) {
-    return _then(_$Counter(
-      null == state
-          ? _value.state
-          : state // ignore: cast_nullable_to_non_nullable
-              as CounterState,
-    ));
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $CounterStateCopyWith<$Res> get state {
-    return $CounterStateCopyWith<$Res>(_value.state, (value) {
-      return _then(_value.copyWith(state: value));
-    });
-  }
 }
 
 /// @nodoc
 
 class _$Counter implements Counter {
-  const _$Counter(this.state);
-
-  @override
-  final CounterState state;
+  const _$Counter();
 
   @override
   String toString() {
-    return 'AppPage.counter(state: $state)';
+    return 'AppPage.counter()';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$Counter &&
-            (identical(other.state, state) || other.state == state));
+        (other.runtimeType == runtimeType && other is _$Counter);
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, state);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CounterCopyWith<_$Counter> get copyWith =>
-      __$$CounterCopyWithImpl<_$Counter>(this, _$identity);
+  int get hashCode => runtimeType.hashCode;
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(CounterState state) counter,
-    required TResult Function(InputTextState state) inputText,
+    required TResult Function() counter,
+    required TResult Function() inputText,
   }) {
-    return counter(state);
+    return counter();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterState state)? counter,
-    TResult? Function(InputTextState state)? inputText,
+    TResult? Function()? counter,
+    TResult? Function()? inputText,
   }) {
-    return counter?.call(state);
+    return counter?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterState state)? counter,
-    TResult Function(InputTextState state)? inputText,
+    TResult Function()? counter,
+    TResult Function()? inputText,
     required TResult orElse(),
   }) {
     if (counter != null) {
-      return counter(state);
+      return counter();
     }
     return orElse();
   }
@@ -207,13 +170,7 @@ class _$Counter implements Counter {
 }
 
 abstract class Counter implements AppPage {
-  const factory Counter(final CounterState state) = _$Counter;
-
-  @override
-  CounterState get state;
-  @JsonKey(ignore: true)
-  _$$CounterCopyWith<_$Counter> get copyWith =>
-      throw _privateConstructorUsedError;
+  const factory Counter() = _$Counter;
 }
 
 /// @nodoc
@@ -221,10 +178,6 @@ abstract class _$$InputTextCopyWith<$Res> {
   factory _$$InputTextCopyWith(
           _$InputText value, $Res Function(_$InputText) then) =
       __$$InputTextCopyWithImpl<$Res>;
-  @useResult
-  $Res call({InputTextState state});
-
-  $InputTextStateCopyWith<$Res> get state;
 }
 
 /// @nodoc
@@ -234,86 +187,54 @@ class __$$InputTextCopyWithImpl<$Res>
   __$$InputTextCopyWithImpl(
       _$InputText _value, $Res Function(_$InputText) _then)
       : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? state = null,
-  }) {
-    return _then(_$InputText(
-      null == state
-          ? _value.state
-          : state // ignore: cast_nullable_to_non_nullable
-              as InputTextState,
-    ));
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $InputTextStateCopyWith<$Res> get state {
-    return $InputTextStateCopyWith<$Res>(_value.state, (value) {
-      return _then(_value.copyWith(state: value));
-    });
-  }
 }
 
 /// @nodoc
 
 class _$InputText implements InputText {
-  const _$InputText(this.state);
-
-  @override
-  final InputTextState state;
+  const _$InputText();
 
   @override
   String toString() {
-    return 'AppPage.inputText(state: $state)';
+    return 'AppPage.inputText()';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$InputText &&
-            (identical(other.state, state) || other.state == state));
+        (other.runtimeType == runtimeType && other is _$InputText);
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, state);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$InputTextCopyWith<_$InputText> get copyWith =>
-      __$$InputTextCopyWithImpl<_$InputText>(this, _$identity);
+  int get hashCode => runtimeType.hashCode;
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(CounterState state) counter,
-    required TResult Function(InputTextState state) inputText,
+    required TResult Function() counter,
+    required TResult Function() inputText,
   }) {
-    return inputText(state);
+    return inputText();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterState state)? counter,
-    TResult? Function(InputTextState state)? inputText,
+    TResult? Function()? counter,
+    TResult? Function()? inputText,
   }) {
-    return inputText?.call(state);
+    return inputText?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterState state)? counter,
-    TResult Function(InputTextState state)? inputText,
+    TResult Function()? counter,
+    TResult Function()? inputText,
     required TResult orElse(),
   }) {
     if (inputText != null) {
-      return inputText(state);
+      return inputText();
     }
     return orElse();
   }
@@ -351,37 +272,25 @@ class _$InputText implements InputText {
 }
 
 abstract class InputText implements AppPage {
-  const factory InputText(final InputTextState state) = _$InputText;
-
-  @override
-  InputTextState get state;
-  @JsonKey(ignore: true)
-  _$$InputTextCopyWith<_$InputText> get copyWith =>
-      throw _privateConstructorUsedError;
+  const factory InputText() = _$InputText;
 }
 
 /// @nodoc
 mixin _$Msg {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(CounterMsgType counterMsg) counterMsg,
-    required TResult Function(InputTextMsgType inputTextMsg) inputTextMsg,
     required TResult Function() switchToCounter,
     required TResult Function() switchToInputText,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsgType counterMsg)? counterMsg,
-    TResult? Function(InputTextMsgType inputTextMsg)? inputTextMsg,
     TResult? Function()? switchToCounter,
     TResult? Function()? switchToInputText,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterMsgType counterMsg)? counterMsg,
-    TResult Function(InputTextMsgType inputTextMsg)? inputTextMsg,
     TResult Function()? switchToCounter,
     TResult Function()? switchToInputText,
     required TResult orElse(),
@@ -389,24 +298,18 @@ mixin _$Msg {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(CounterMsg value) counterMsg,
-    required TResult Function(InputTextMsg value) inputTextMsg,
     required TResult Function(SwitchToCounter value) switchToCounter,
     required TResult Function(SwitchToInputText value) switchToInputText,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsg value)? counterMsg,
-    TResult? Function(InputTextMsg value)? inputTextMsg,
     TResult? Function(SwitchToCounter value)? switchToCounter,
     TResult? Function(SwitchToInputText value)? switchToInputText,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(CounterMsg value)? counterMsg,
-    TResult Function(InputTextMsg value)? inputTextMsg,
     TResult Function(SwitchToCounter value)? switchToCounter,
     TResult Function(SwitchToInputText value)? switchToInputText,
     required TResult orElse(),
@@ -428,319 +331,6 @@ class _$MsgCopyWithImpl<$Res, $Val extends Msg> implements $MsgCopyWith<$Res> {
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-}
-
-/// @nodoc
-abstract class _$$CounterMsgCopyWith<$Res> {
-  factory _$$CounterMsgCopyWith(
-          _$CounterMsg value, $Res Function(_$CounterMsg) then) =
-      __$$CounterMsgCopyWithImpl<$Res>;
-  @useResult
-  $Res call({CounterMsgType counterMsg});
-
-  $CounterMsgTypeCopyWith<$Res> get counterMsg;
-}
-
-/// @nodoc
-class __$$CounterMsgCopyWithImpl<$Res>
-    extends _$MsgCopyWithImpl<$Res, _$CounterMsg>
-    implements _$$CounterMsgCopyWith<$Res> {
-  __$$CounterMsgCopyWithImpl(
-      _$CounterMsg _value, $Res Function(_$CounterMsg) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? counterMsg = null,
-  }) {
-    return _then(_$CounterMsg(
-      null == counterMsg
-          ? _value.counterMsg
-          : counterMsg // ignore: cast_nullable_to_non_nullable
-              as CounterMsgType,
-    ));
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $CounterMsgTypeCopyWith<$Res> get counterMsg {
-    return $CounterMsgTypeCopyWith<$Res>(_value.counterMsg, (value) {
-      return _then(_value.copyWith(counterMsg: value));
-    });
-  }
-}
-
-/// @nodoc
-
-class _$CounterMsg implements CounterMsg {
-  const _$CounterMsg(this.counterMsg);
-
-  @override
-  final CounterMsgType counterMsg;
-
-  @override
-  String toString() {
-    return 'Msg.counterMsg(counterMsg: $counterMsg)';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CounterMsg &&
-            (identical(other.counterMsg, counterMsg) ||
-                other.counterMsg == counterMsg));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, counterMsg);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CounterMsgCopyWith<_$CounterMsg> get copyWith =>
-      __$$CounterMsgCopyWithImpl<_$CounterMsg>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(CounterMsgType counterMsg) counterMsg,
-    required TResult Function(InputTextMsgType inputTextMsg) inputTextMsg,
-    required TResult Function() switchToCounter,
-    required TResult Function() switchToInputText,
-  }) {
-    return counterMsg(this.counterMsg);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsgType counterMsg)? counterMsg,
-    TResult? Function(InputTextMsgType inputTextMsg)? inputTextMsg,
-    TResult? Function()? switchToCounter,
-    TResult? Function()? switchToInputText,
-  }) {
-    return counterMsg?.call(this.counterMsg);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterMsgType counterMsg)? counterMsg,
-    TResult Function(InputTextMsgType inputTextMsg)? inputTextMsg,
-    TResult Function()? switchToCounter,
-    TResult Function()? switchToInputText,
-    required TResult orElse(),
-  }) {
-    if (counterMsg != null) {
-      return counterMsg(this.counterMsg);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(CounterMsg value) counterMsg,
-    required TResult Function(InputTextMsg value) inputTextMsg,
-    required TResult Function(SwitchToCounter value) switchToCounter,
-    required TResult Function(SwitchToInputText value) switchToInputText,
-  }) {
-    return counterMsg(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsg value)? counterMsg,
-    TResult? Function(InputTextMsg value)? inputTextMsg,
-    TResult? Function(SwitchToCounter value)? switchToCounter,
-    TResult? Function(SwitchToInputText value)? switchToInputText,
-  }) {
-    return counterMsg?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(CounterMsg value)? counterMsg,
-    TResult Function(InputTextMsg value)? inputTextMsg,
-    TResult Function(SwitchToCounter value)? switchToCounter,
-    TResult Function(SwitchToInputText value)? switchToInputText,
-    required TResult orElse(),
-  }) {
-    if (counterMsg != null) {
-      return counterMsg(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class CounterMsg implements Msg {
-  const factory CounterMsg(final CounterMsgType counterMsg) = _$CounterMsg;
-
-  CounterMsgType get counterMsg;
-  @JsonKey(ignore: true)
-  _$$CounterMsgCopyWith<_$CounterMsg> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class _$$InputTextMsgCopyWith<$Res> {
-  factory _$$InputTextMsgCopyWith(
-          _$InputTextMsg value, $Res Function(_$InputTextMsg) then) =
-      __$$InputTextMsgCopyWithImpl<$Res>;
-  @useResult
-  $Res call({InputTextMsgType inputTextMsg});
-
-  $InputTextMsgTypeCopyWith<$Res> get inputTextMsg;
-}
-
-/// @nodoc
-class __$$InputTextMsgCopyWithImpl<$Res>
-    extends _$MsgCopyWithImpl<$Res, _$InputTextMsg>
-    implements _$$InputTextMsgCopyWith<$Res> {
-  __$$InputTextMsgCopyWithImpl(
-      _$InputTextMsg _value, $Res Function(_$InputTextMsg) _then)
-      : super(_value, _then);
-
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? inputTextMsg = null,
-  }) {
-    return _then(_$InputTextMsg(
-      null == inputTextMsg
-          ? _value.inputTextMsg
-          : inputTextMsg // ignore: cast_nullable_to_non_nullable
-              as InputTextMsgType,
-    ));
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $InputTextMsgTypeCopyWith<$Res> get inputTextMsg {
-    return $InputTextMsgTypeCopyWith<$Res>(_value.inputTextMsg, (value) {
-      return _then(_value.copyWith(inputTextMsg: value));
-    });
-  }
-}
-
-/// @nodoc
-
-class _$InputTextMsg implements InputTextMsg {
-  const _$InputTextMsg(this.inputTextMsg);
-
-  @override
-  final InputTextMsgType inputTextMsg;
-
-  @override
-  String toString() {
-    return 'Msg.inputTextMsg(inputTextMsg: $inputTextMsg)';
-  }
-
-  @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$InputTextMsg &&
-            (identical(other.inputTextMsg, inputTextMsg) ||
-                other.inputTextMsg == inputTextMsg));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, inputTextMsg);
-
-  @JsonKey(ignore: true)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$InputTextMsgCopyWith<_$InputTextMsg> get copyWith =>
-      __$$InputTextMsgCopyWithImpl<_$InputTextMsg>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(CounterMsgType counterMsg) counterMsg,
-    required TResult Function(InputTextMsgType inputTextMsg) inputTextMsg,
-    required TResult Function() switchToCounter,
-    required TResult Function() switchToInputText,
-  }) {
-    return inputTextMsg(this.inputTextMsg);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsgType counterMsg)? counterMsg,
-    TResult? Function(InputTextMsgType inputTextMsg)? inputTextMsg,
-    TResult? Function()? switchToCounter,
-    TResult? Function()? switchToInputText,
-  }) {
-    return inputTextMsg?.call(this.inputTextMsg);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterMsgType counterMsg)? counterMsg,
-    TResult Function(InputTextMsgType inputTextMsg)? inputTextMsg,
-    TResult Function()? switchToCounter,
-    TResult Function()? switchToInputText,
-    required TResult orElse(),
-  }) {
-    if (inputTextMsg != null) {
-      return inputTextMsg(this.inputTextMsg);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(CounterMsg value) counterMsg,
-    required TResult Function(InputTextMsg value) inputTextMsg,
-    required TResult Function(SwitchToCounter value) switchToCounter,
-    required TResult Function(SwitchToInputText value) switchToInputText,
-  }) {
-    return inputTextMsg(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsg value)? counterMsg,
-    TResult? Function(InputTextMsg value)? inputTextMsg,
-    TResult? Function(SwitchToCounter value)? switchToCounter,
-    TResult? Function(SwitchToInputText value)? switchToInputText,
-  }) {
-    return inputTextMsg?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(CounterMsg value)? counterMsg,
-    TResult Function(InputTextMsg value)? inputTextMsg,
-    TResult Function(SwitchToCounter value)? switchToCounter,
-    TResult Function(SwitchToInputText value)? switchToInputText,
-    required TResult orElse(),
-  }) {
-    if (inputTextMsg != null) {
-      return inputTextMsg(this);
-    }
-    return orElse();
-  }
-}
-
-abstract class InputTextMsg implements Msg {
-  const factory InputTextMsg(final InputTextMsgType inputTextMsg) =
-      _$InputTextMsg;
-
-  InputTextMsgType get inputTextMsg;
-  @JsonKey(ignore: true)
-  _$$InputTextMsgCopyWith<_$InputTextMsg> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -781,8 +371,6 @@ class _$SwitchToCounter implements SwitchToCounter {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(CounterMsgType counterMsg) counterMsg,
-    required TResult Function(InputTextMsgType inputTextMsg) inputTextMsg,
     required TResult Function() switchToCounter,
     required TResult Function() switchToInputText,
   }) {
@@ -792,8 +380,6 @@ class _$SwitchToCounter implements SwitchToCounter {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsgType counterMsg)? counterMsg,
-    TResult? Function(InputTextMsgType inputTextMsg)? inputTextMsg,
     TResult? Function()? switchToCounter,
     TResult? Function()? switchToInputText,
   }) {
@@ -803,8 +389,6 @@ class _$SwitchToCounter implements SwitchToCounter {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterMsgType counterMsg)? counterMsg,
-    TResult Function(InputTextMsgType inputTextMsg)? inputTextMsg,
     TResult Function()? switchToCounter,
     TResult Function()? switchToInputText,
     required TResult orElse(),
@@ -818,8 +402,6 @@ class _$SwitchToCounter implements SwitchToCounter {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(CounterMsg value) counterMsg,
-    required TResult Function(InputTextMsg value) inputTextMsg,
     required TResult Function(SwitchToCounter value) switchToCounter,
     required TResult Function(SwitchToInputText value) switchToInputText,
   }) {
@@ -829,8 +411,6 @@ class _$SwitchToCounter implements SwitchToCounter {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsg value)? counterMsg,
-    TResult? Function(InputTextMsg value)? inputTextMsg,
     TResult? Function(SwitchToCounter value)? switchToCounter,
     TResult? Function(SwitchToInputText value)? switchToInputText,
   }) {
@@ -840,8 +420,6 @@ class _$SwitchToCounter implements SwitchToCounter {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(CounterMsg value)? counterMsg,
-    TResult Function(InputTextMsg value)? inputTextMsg,
     TResult Function(SwitchToCounter value)? switchToCounter,
     TResult Function(SwitchToInputText value)? switchToInputText,
     required TResult orElse(),
@@ -895,8 +473,6 @@ class _$SwitchToInputText implements SwitchToInputText {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(CounterMsgType counterMsg) counterMsg,
-    required TResult Function(InputTextMsgType inputTextMsg) inputTextMsg,
     required TResult Function() switchToCounter,
     required TResult Function() switchToInputText,
   }) {
@@ -906,8 +482,6 @@ class _$SwitchToInputText implements SwitchToInputText {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsgType counterMsg)? counterMsg,
-    TResult? Function(InputTextMsgType inputTextMsg)? inputTextMsg,
     TResult? Function()? switchToCounter,
     TResult? Function()? switchToInputText,
   }) {
@@ -917,8 +491,6 @@ class _$SwitchToInputText implements SwitchToInputText {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(CounterMsgType counterMsg)? counterMsg,
-    TResult Function(InputTextMsgType inputTextMsg)? inputTextMsg,
     TResult Function()? switchToCounter,
     TResult Function()? switchToInputText,
     required TResult orElse(),
@@ -932,8 +504,6 @@ class _$SwitchToInputText implements SwitchToInputText {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(CounterMsg value) counterMsg,
-    required TResult Function(InputTextMsg value) inputTextMsg,
     required TResult Function(SwitchToCounter value) switchToCounter,
     required TResult Function(SwitchToInputText value) switchToInputText,
   }) {
@@ -943,8 +513,6 @@ class _$SwitchToInputText implements SwitchToInputText {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(CounterMsg value)? counterMsg,
-    TResult? Function(InputTextMsg value)? inputTextMsg,
     TResult? Function(SwitchToCounter value)? switchToCounter,
     TResult? Function(SwitchToInputText value)? switchToInputText,
   }) {
@@ -954,8 +522,6 @@ class _$SwitchToInputText implements SwitchToInputText {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(CounterMsg value)? counterMsg,
-    TResult Function(InputTextMsg value)? inputTextMsg,
     TResult Function(SwitchToCounter value)? switchToCounter,
     TResult Function(SwitchToInputText value)? switchToInputText,
     required TResult orElse(),

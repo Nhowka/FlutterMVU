@@ -1,3 +1,11 @@
+# 0.3.2
+
+- Expose the [MVUProcessor] to allow the processing of messages from outside the view. This is useful for testing and for processing messages on the background. Also can be used to add subclasses of the [MVUProcessor] into dependency injection solutions to pass the same processor instance across different locations on the app.
+- Add functions [useModel] and [subscribe] into the [MVUProcessor] so you can access the model and subscribe to it from outside the view. This is useful for testing and for implementing CLI apps. You can import only the `package:mvu_layer/mvu_processor.dart` to avoid the `dart:ui` import.
+- Add widgets [MVUProvider] and [MVUContext]. This is used to get the [MVUProcessor] through the widget tree, adding a view to the [MVUProcessor] only when needed.
+- Add subscriptions like Elmish. These subscriptions are enabled on the background and can be used to dispatch messages to the update function. The subscriptions have an id and are recalculated on every model change. If a new id is returned, the subscription starts and if an old id is not returned, the subscription is cancelled. This is useful for implementing long running tasks like timers or listening on external events.
+
+
 # 0.3.1
 
 - Add widget classes [MVUWidget] and [MVUWidgetWithTicker] to simplify the implementation of MVU widgets that might need single init dependencies. These dependencies should be final fields and can be accessed from the init and update function without polluting the model or requiring a closure. 

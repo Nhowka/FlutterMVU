@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mvu_layer/mvu.dart';
 
+import './page/counter/update.dart';
+import './page/input_text/update.dart';
+
 import './page/update.dart';
 import './page/view.dart';
 
@@ -20,12 +23,13 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Card(
-        child: MVUBuilder(
-            init: init,
-            update: update,
-            view: view),
+        child: CounterProvider(
+          child: MVUProvider.fromProcessor(
+            processor: InputTextProcessor(),
+            child: MVUBuilder(init: init, update: update, view: view),
+          ),
+        ),
       ),
     );
   }
 }
-

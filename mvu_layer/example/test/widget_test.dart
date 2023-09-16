@@ -16,7 +16,7 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(WidgetsApp(
       color: const Color(-1),
-      builder: (_, __) => MVUBuilder(init: init, update: update, view: view),
+      builder: (_, __) => CounterProvider(child: MVUContext(view: view)),
     ));
     expect(find.text("0"), findsOneWidget);
     expect(find.text("1"), findsNothing);

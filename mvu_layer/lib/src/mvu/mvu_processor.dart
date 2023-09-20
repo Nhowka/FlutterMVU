@@ -143,8 +143,6 @@ abstract class MVUProcessor<Model, Msg> {
   /// Creates a list of subscriptions using the model.
   Subs<Msg> subscriptions(Model model) => [];
 
-  MVUProcessor();
-
   /// Create a new MVUProcessor from functions instead of subclassing.
   factory MVUProcessor.fromFunctions(
           {required (Model, Cmd<Msg>) Function() init,
@@ -152,8 +150,11 @@ abstract class MVUProcessor<Model, Msg> {
           Subscription<Model, Msg>? subscriptions}) =>
       _DelegatingMVUProcessor(init, update, subscriptions);
 
-  late _MVUProcessor<Model, Msg> _processor =
-      _MVUProcessor(init, update, subscriptions);
+  late final _MVUProcessor<Model, Msg> _processor;
+
+  MVUProcessor() {
+    _processor = _MVUProcessor(init, update, subscriptions);
+  }
 
   /// Dispatch a message to the processor.
   void dispatch(Msg msg) {
@@ -182,7 +183,8 @@ class _DelegatingMVUProcessor<Model, Msg> extends MVUProcessor<Model, Msg> {
       [Subscription<Model, Msg>? subscriptions])
       : _init = init,
         _update = update,
-        _subscriptions = subscriptions ?? ((_) => []);
+        _subscriptions = subscriptions ?? ((_) => []),
+        super();
 
   @override
   (Model, Cmd<Msg>) init() => _init();

@@ -1,3 +1,7 @@
+# 0.3.3
+
+- Bugfix: Processor was being lazily initialized, which was causing some issues like subscriptions not starting when using it from outside the view. Now it's initialized on the constructor.
+
 # 0.3.2
 
 - Expose the [MVUProcessor] to allow the processing of messages from outside the view. This is useful for testing and for processing messages on the background. Also can be used to add subclasses of the [MVUProcessor] into dependency injection solutions to pass the same processor instance across different locations on the app.

@@ -143,17 +143,22 @@ abstract class MVUProcessor<Model, Msg> {
   /// Creates a list of subscriptions using the model.
   Subs<Msg> subscriptions(Model model) => [];
 
+  /// Defines the function to use to compare models to prevent unnecessary updates.
+  bool modelEquality(Model previousModel, Model nextModel) =>
+      identical(previousModel, nextModel);
+
   /// Create a new MVUProcessor from functions instead of subclassing.
   factory MVUProcessor.fromFunctions(
           {required (Model, Cmd<Msg>) Function() init,
           required (Model, Cmd<Msg>) Function(Msg, Model) update,
-          Subscription<Model, Msg>? subscriptions}) =>
-      _DelegatingMVUProcessor(init, update, subscriptions);
+          Subscription<Model, Msg>? subscriptions,
+          bool Function(Model, Model)? modelEquality}) =>
+      _DelegatingMVUProcessor(init, update, subscriptions, modelEquality);
 
   late final _MVUProcessor<Model, Msg> _processor;
 
   MVUProcessor() {
-    _processor = _MVUProcessor(init, update, subscriptions);
+    _processor = _MVUProcessor(init, update, subscriptions, modelEquality);
   }
 
   /// Dispatch a message to the processor.
@@ -177,13 +182,17 @@ class _DelegatingMVUProcessor<Model, Msg> extends MVUProcessor<Model, Msg> {
   final (Model, Cmd<Msg>) Function() _init;
   final (Model, Cmd<Msg>) Function(Msg, Model) _update;
   final Subs<Msg> Function(Model) _subscriptions;
+  final bool Function(Model, Model) _modelEquality;
 
-  _DelegatingMVUProcessor((Model, Cmd<Msg>) Function() init,
+  _DelegatingMVUProcessor(
+      (Model, Cmd<Msg>) Function() init,
       (Model, Cmd<Msg>) Function(Msg, Model) update,
-      [Subscription<Model, Msg>? subscriptions])
+      Subscription<Model, Msg>? subscriptions,
+      bool Function(Model, Model)? modelEquality)
       : _init = init,
         _update = update,
         _subscriptions = subscriptions ?? ((_) => []),
+        _modelEquality = modelEquality ?? identical,
         super();
 
   @override
@@ -191,6 +200,10 @@ class _DelegatingMVUProcessor<Model, Msg> extends MVUProcessor<Model, Msg> {
 
   @override
   (Model, Cmd<Msg>) update(Msg msg, Model model) => _update(msg, model);
+
+  @override
+  bool modelEquality(Model previousModel, Model nextModel) =>
+      _modelEquality(previousModel, nextModel);
 
   @override
   Subs<Msg> subscriptions(Model model) => _subscriptions(model);
@@ -292,6 +305,7 @@ class _MVUProcessor<Model, Msg> {
   final StreamController<Model> changes = StreamController.broadcast();
   late final StreamSubscription<Msg> _appLoopSub;
   late final _SubscriptionController<Model, Msg> _subscriptionController;
+  final bool Function(Model, Model) _modelEquality;
 
   void post(Msg msg) {
     if (!_mainLoop.isClosed) {
@@ -304,7 +318,9 @@ class _MVUProcessor<Model, Msg> {
   _MVUProcessor(
       (Model, Cmd<Msg>) Function() init,
       (Model, Cmd<Msg>) Function(Msg, Model) update,
-      Subscription<Model, Msg>? subscriptions) {
+      Subscription<Model, Msg>? subscriptions,
+      [bool Function(Model, Model) modelEquality = identical])
+      : _modelEquality = modelEquality {
     _subscriptionController =
         _SubscriptionController(post, subscriptions ?? (_) => []);
     var (newModel, commands) = init();
@@ -317,12 +333,13 @@ class _MVUProcessor<Model, Msg> {
     _appLoopSub = _mainLoop.stream.listen((Msg msg) {
       final (nextModel, nextcommands) = update(msg, newModel);
 
-      /// Sets the state again on each new message if different
-      if (newModel != nextModel) {
-        newModel = nextModel;
-        changes.add(newModel);
-        _currentModel = newModel;
+      /// Publish the changes in the state if the model is considered changed.
+      if (!_modelEquality(newModel, nextModel)) {
+        changes.add(nextModel);
       }
+      newModel = nextModel;
+      _currentModel = newModel;
+
       _subscriptionController.calculate(newModel);
       nextcommands._commands.forEach((cmd) => cmd(this.post));
     });

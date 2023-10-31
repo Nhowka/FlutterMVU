@@ -15,6 +15,7 @@ class MVUProvider<Model, Msg> extends StatefulWidget {
   ///  * [init] is called once to return the initial model and commands.
   ///  * [update] is called when a message is received to update the model and return new commands.
   ///  * [subscriptions] is called to return subscriptions to be executed if enabled by the model.
+  ///  * [modelEquality] is used to compare the model and avoid unnecessary rebuilds.
   ///  * [child] is the widget to be rendered.
   ///  * [onInit] is called when the widget is initialized.
   ///  * [onDispose] is called when the widget is disposed.
@@ -22,12 +23,16 @@ class MVUProvider<Model, Msg> extends StatefulWidget {
       {required (Model, Cmd<Msg>) Function() init,
       required (Model, Cmd<Msg>) Function(Msg, Model) update,
       Subscription<Model, Msg>? subscriptions,
+      bool Function(Model, Model)? modelEquality,
       this.child = const SizedBox.shrink(),
       this.onInit,
       this.onDispose,
       super.key})
       : processor = MVUProcessor.fromFunctions(
-            init: init, update: update, subscriptions: subscriptions);
+            init: init,
+            update: update,
+            subscriptions: subscriptions,
+            modelEquality: modelEquality);
 
   /// Creates a [MVUProvider] with the given [processor].
   /// * [processor] is the processor to be used.
@@ -159,6 +164,9 @@ abstract class MVUWidget<Model, Msg> extends Widget {
   (Model, Cmd<Msg>) init();
 
   Subs<Msg> subscriptions(Model model) => [];
+
+  bool modelEquality(Model previousModel, Model nextModel) =>
+      identical(previousModel, nextModel);
 }
 
 /// Same as [MVUWidget] but with a [TickerProvider] for animations.
@@ -175,9 +183,10 @@ abstract class MVUWidgetWithTicker<Model, Msg> extends Widget {
 
   (Model, Cmd<Msg>) init();
 
-  Subs<Msg> subscriptions(Model model) => [
-        Sub.fromFuture<Msg, int>(['id'], Future.sync(() => 1), (int p0) => null)
-      ];
+  Subs<Msg> subscriptions(Model model) => [];
+
+  bool modelEquality(Model previousModel, Model nextModel) =>
+      identical(previousModel, nextModel);
 }
 
 class _MVUWidgetElement<Model, Msg> extends ComponentElement {
@@ -190,7 +199,8 @@ class _MVUWidgetElement<Model, Msg> extends ComponentElement {
         init: builder.init,
         update: builder.update,
         view: builder.build,
-        subscriptions: builder.subscriptions);
+        subscriptions: builder.subscriptions,
+        modelEquality: builder.modelEquality);
   }
 }
 
@@ -204,7 +214,8 @@ class _MVUWidgetElementWithTicker<Model, Msg> extends ComponentElement {
         init: builder.init,
         update: builder.update,
         view: builder.build,
-        subscriptions: builder.subscriptions);
+        subscriptions: builder.subscriptions,
+        modelEquality: builder.modelEquality);
   }
 }
 
@@ -218,6 +229,7 @@ class _MVUWidgetElementProvider<Model, Msg> extends ComponentElement {
         init: builder.init,
         update: builder.update,
         subscriptions: builder.subscriptions,
+        modelEquality: builder.modelEquality,
         child: builder.child,
         onInit: builder.onInit,
         onDispose: builder.onDispose);
@@ -235,6 +247,9 @@ abstract class MVUProviderWidget<Model, Msg> extends Widget {
   (Model, Cmd<Msg>) init();
 
   Subs<Msg> subscriptions(Model model) => [];
+
+  bool modelEquality(Model previousModel, Model nextModel) =>
+      identical(previousModel, nextModel);
 
   const MVUProviderWidget(
       {required this.child, this.onInit, this.onDispose, super.key});

@@ -1,3 +1,7 @@
+# 0.3.4
+
+- Expose the `modelEquality` function on the `MVUProcessor` constructor. This can be used to avoid multiple renders when the model has no changes that affect the view. This is useful for performance and to avoid some bugs when using the `MVUProcessor` on the background.
+
 # 0.3.3
 
 - Bugfix: Processor was being lazily initialized, which was causing some issues like subscriptions not starting when using it from outside the view. Now it's initialized on the constructor.

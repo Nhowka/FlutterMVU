@@ -43,10 +43,14 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
       {required (Model, Cmd<Msg>) Function() init,
       required (Model, Cmd<Msg>) Function(Msg, Model) update,
       required MsgWidgetBuilder<Model, Msg> view,
-      Subscription<Model, Msg>? subscriptions})
+      Subscription<Model, Msg>? subscriptions,
+      bool Function(Model, Model)? modelEquality})
       : this._(
             MVUProcessor.fromFunctions(
-                init: init, update: update, subscriptions: subscriptions),
+                init: init,
+                update: update,
+                subscriptions: subscriptions,
+                modelEquality: modelEquality),
             ((BuildContext context, TickerProvider _, Model model,
                     Dispatch<Msg> dispatcher) =>
                 view(context, model, dispatcher)));
@@ -60,10 +64,14 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
       {required (Model, Cmd<Msg>) Function() init,
       required (Model, Cmd<Msg>) Function(Msg, Model) update,
       required MsgWidgetBuilderWithTickerProvider<Model, Msg> view,
-      Subscription<Model, Msg>? subscriptions})
+      Subscription<Model, Msg>? subscriptions,
+      bool Function(Model, Model)? modelEquality})
       : this._(
             MVUProcessor.fromFunctions(
-                init: init, update: update, subscriptions: subscriptions),
+                init: init,
+                update: update,
+                subscriptions: subscriptions,
+                modelEquality: modelEquality),
             view);
 
   /// Creates a [MVUBuilder] with the given [init], [update] and [view] functions.
@@ -71,36 +79,36 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
   /// * [update] is called when a message is received to update the model and return new commands.
   /// * [view] is called to render the view and dispatch new messages.
   /// * [tickerProvider] is used to create a [Ticker] for animations.
-  static MVUBuilder<Model, Msg> withArgAndTickerProvider<Model, Msg, Arg>(
-    Arg a, {
-    required (Model, Cmd<Msg>) Function(Arg) init,
-    required (Model, Cmd<Msg>) Function(Msg, Model) update,
-    required MsgWidgetBuilderWithTickerProvider<Model, Msg> view,
-    Subscription<Model, Msg>? subscriptions,
-  }) =>
+  static MVUBuilder<Model, Msg> withArgAndTickerProvider<Model, Msg, Arg>(Arg a,
+          {required (Model, Cmd<Msg>) Function(Arg) init,
+          required (Model, Cmd<Msg>) Function(Msg, Model) update,
+          required MsgWidgetBuilderWithTickerProvider<Model, Msg> view,
+          Subscription<Model, Msg>? subscriptions,
+          bool Function(Model, Model)? modelEquality}) =>
       MVUBuilder._(
           MVUProcessor.fromFunctions(
               init: () => init(a),
               update: update,
-              subscriptions: subscriptions),
+              subscriptions: subscriptions,
+              modelEquality: modelEquality),
           view);
 
   /// Creates a [MVUBuilder] with the given [init], [update] and [view] functions.
   /// * [init] is called once with the given [argument] to return the initial model and commands.
   /// * [update] is called when a message is received to update the model and return new commands.
   /// * [view] is called to render the view and dispatch new messages.
-  static MVUBuilder<Model, Msg> withArg<Model, Msg, Arg>(
-    Arg a, {
-    required (Model, Cmd<Msg>) Function(Arg) init,
-    required (Model, Cmd<Msg>) Function(Msg, Model) update,
-    required MsgWidgetBuilder<Model, Msg> view,
-    Subscription<Model, Msg>? subscriptions,
-  }) =>
+  static MVUBuilder<Model, Msg> withArg<Model, Msg, Arg>(Arg a,
+          {required (Model, Cmd<Msg>) Function(Arg) init,
+          required (Model, Cmd<Msg>) Function(Msg, Model) update,
+          required MsgWidgetBuilder<Model, Msg> view,
+          Subscription<Model, Msg>? subscriptions,
+          bool Function(Model, Model)? modelEquality}) =>
       MVUBuilder._(
           MVUProcessor.fromFunctions(
               init: () => init(a),
               update: update,
-              subscriptions: subscriptions),
+              subscriptions: subscriptions,
+              modelEquality: modelEquality),
           (BuildContext context, TickerProvider _, Model model,
                   Dispatch<Msg> dispatcher) =>
               view(context, model, dispatcher));

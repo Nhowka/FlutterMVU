@@ -1,6 +1,6 @@
 name: mvu_layer
 description: An Elm-inspired state management for leveraging benefits from the Elm architecture while still being Dart friendly.
-version: 0.3.4
+version: 0.3.5
 homepage: https://github.com/Nhowka/FlutterMVU
 
 environment:

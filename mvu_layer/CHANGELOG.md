@@ -1,3 +1,8 @@
+# 0.3.5
+
+- Add support for an `onDispose` function on the `MVUBuilder` constructor and `dispose` functions on the `MVUWidget` and similar widgets. These will be called when the widget is removed from the widget tree. 
+- Add a helper function on `Cmd` and `Dispatch` making it possible to consume a `Cmd` with another `Dispatch` function. This might be useful for test scenarios, enabling peeking into the messages dispatched.
+
 # 0.3.4
 
 - Expose the `modelEquality` function on the `MVUProcessor` constructor. This can be used to avoid multiple renders when the model has no changes that affect the view. This is useful for performance and to avoid some bugs when using the `MVUProcessor` on the background.

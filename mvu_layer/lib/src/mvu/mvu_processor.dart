@@ -14,6 +14,16 @@ extension MappedDispatch<Msg> on Dispatch<Msg> {
   /// Takes a function that returns the parent message using the child message.
   Dispatch<InnerMsg> map<InnerMsg>(Msg Function(InnerMsg inner) mapper) =>
       (msg) => this(mapper(msg));
+
+  /// This helper function can be used in different scenarios where you have a Cmd and
+  /// need to process them using an available dispatch in the context.
+  ///
+  /// One of such scenarios could be integration tests to guarantee the messages
+  /// being emitted or in subscriptions where you have a dispatch function that you might
+  /// want to share a Cmd in response to an event.
+  void consume(Cmd<Msg> cmd) {
+    cmd.consumeWith(this);
+  }
 }
 
 extension MappedUpdate<InnerModel, InnerMsg> on (InnerModel, Cmd<InnerMsg>) {
@@ -33,6 +43,15 @@ class Cmd<Msg> {
   final List<Effect<Msg>> _commands;
 
   const Cmd(List<Effect<Msg>> base) : this._commands = base;
+
+  /// This helper function can be used in different scenarios where you have a Cmd and
+  /// need to process them using an available dispatch in the context.
+  ///
+  /// One of such scenarios could be integration tests to guarantee the messages
+  /// being emitted or in subscriptions where you have a dispatch function that you might
+  /// want to share an existing Cmd to be consumed in response to an event.
+  void consumeWith(Dispatch<Msg> dispatch) =>
+      _commands.forEach((effect) => effect(dispatch));
 
   /// The empty case when no messages are needed.
   static Cmd<Msg> none<Msg>() => const Cmd([]);

@@ -165,6 +165,8 @@ abstract class MVUWidget<Model, Msg> extends Widget {
 
   Subs<Msg> subscriptions(Model model) => [];
 
+  void dispose() {}
+
   bool modelEquality(Model previousModel, Model nextModel) =>
       identical(previousModel, nextModel);
 }
@@ -185,6 +187,8 @@ abstract class MVUWidgetWithTicker<Model, Msg> extends Widget {
 
   Subs<Msg> subscriptions(Model model) => [];
 
+  void dispose() {}
+
   bool modelEquality(Model previousModel, Model nextModel) =>
       identical(previousModel, nextModel);
 }
@@ -200,7 +204,8 @@ class _MVUWidgetElement<Model, Msg> extends ComponentElement {
         update: builder.update,
         view: builder.build,
         subscriptions: builder.subscriptions,
-        modelEquality: builder.modelEquality);
+        modelEquality: builder.modelEquality,
+        onDispose: builder.dispose);
   }
 }
 
@@ -215,7 +220,8 @@ class _MVUWidgetElementWithTicker<Model, Msg> extends ComponentElement {
         update: builder.update,
         view: builder.build,
         subscriptions: builder.subscriptions,
-        modelEquality: builder.modelEquality);
+        modelEquality: builder.modelEquality,
+        onDispose: builder.dispose);
   }
 }
 

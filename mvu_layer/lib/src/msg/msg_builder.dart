@@ -34,10 +34,11 @@ class _MsgBuilderState<T extends Messenger<Model>, Model>
   _MsgBuilderState(this._messenger) {
     _latestModel = _messenger.firstModel;
     _changesSub = _messenger.changes.listen((model) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _latestModel = model;
         });
+      }
     });
   }
 
@@ -90,10 +91,11 @@ class _MsgBuilderWithTickerProviderState<T extends Messenger<Model>, Model>
   _MsgBuilderWithTickerProviderState(this._messenger) {
     _latestModel = _messenger.firstModel;
     _changesSub = _messenger.changes.listen((model) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _latestModel = model;
         });
+      }
     });
   }
 

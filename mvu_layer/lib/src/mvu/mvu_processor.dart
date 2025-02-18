@@ -185,9 +185,17 @@ abstract class MVUProcessor<Model, Msg> {
     _processor.post(msg);
   }
 
-  /// Use the current model and dispatch function.
+  /// Use the model, after all current messages are processed, and dispatch function.
   /// Can be used to return values and dispatch new messages depending on the current model.
-  T useModel<T>(T Function(Model model, Dispatch<Msg> dispatch) handler) =>
+  Future<T> useModel<T>(
+          T Function(Model model, Dispatch<Msg> dispatch) handler) =>
+      _processor._useModel(handler);
+
+  /// Use the current model at the call instant and dispatch function.
+  /// Can be used to return values and dispatch new messages depending on the model.
+  /// If messages were dispatched right before calling this function,
+  /// there is a good chance that the model will be outdated.
+  T useModelSync<T>(T Function(Model model, Dispatch<Msg> dispatch) handler) =>
       handler(_processor.model, _processor.post);
 
   /// Subscribe to changes in the model. This can be used to update the UI.
@@ -318,18 +326,45 @@ class _SubscriptionController<Model, Msg> {
   }
 }
 
+sealed class _MVUControlMsg<Model, Msg> {}
+
+class _MVUMsg<Model, Msg> implements _MVUControlMsg<Model, Msg> {
+  final Msg msg;
+
+  _MVUMsg(this.msg);
+}
+
+class _MVUHandleModel<Model, Msg> implements _MVUControlMsg<Model, Msg> {
+  final void Function(Model model) handler;
+
+  _MVUHandleModel(this.handler);
+}
+
 class _MVUProcessor<Model, Msg> {
   late Model _currentModel;
-  final StreamController<Msg> _mainLoop = StreamController();
+  final StreamController<_MVUControlMsg<Model, Msg>> _mainLoop =
+      StreamController();
   final StreamController<Model> changes = StreamController.broadcast();
-  late final StreamSubscription<Msg> _appLoopSub;
+  late final StreamSubscription<_MVUControlMsg<Model, Msg>> _appLoopSub;
   late final _SubscriptionController<Model, Msg> _subscriptionController;
   final bool Function(Model, Model) _modelEquality;
 
   void post(Msg msg) {
     if (!_mainLoop.isClosed) {
-      _mainLoop.add(msg);
+      _mainLoop.add(_MVUMsg(msg));
     }
+  }
+
+  Future<T> _useModel<T>(
+      T Function(Model model, Dispatch<Msg> dispatch) handler) {
+    Completer<T> completer = Completer();
+    if (!_mainLoop.isClosed) {
+      _mainLoop.add(_MVUHandleModel(
+          (Model model) => completer.complete(handler(model, post))));
+    } else {
+      completer.completeError(StateError('Loop is closed'));
+    }
+    return completer.future;
   }
 
   Model get model => _currentModel;
@@ -349,18 +384,26 @@ class _MVUProcessor<Model, Msg> {
     changes.add(newModel);
     _subscriptionController.calculate(newModel);
 
-    _appLoopSub = _mainLoop.stream.listen((Msg msg) {
-      final (nextModel, nextcommands) = update(msg, newModel);
+    _appLoopSub =
+        _mainLoop.stream.listen((_MVUControlMsg<Model, Msg> controlMsg) {
+      switch (controlMsg) {
+        case _MVUMsg(:final msg):
+          final (nextModel, nextcommands) = update(msg, newModel);
 
-      /// Publish the changes in the state if the model is considered changed.
-      if (!_modelEquality(newModel, nextModel)) {
-        changes.add(nextModel);
+          /// Publish the changes in the state if the model is considered changed.
+          if (!_modelEquality(newModel, nextModel)) {
+            changes.add(nextModel);
+          }
+          newModel = nextModel;
+          _currentModel = newModel;
+
+          _subscriptionController.calculate(newModel);
+          nextcommands.consumeWith(post);
+          break;
+        case _MVUHandleModel(:final handler):
+          handler(newModel);
+          break;
       }
-      newModel = nextModel;
-      _currentModel = newModel;
-
-      _subscriptionController.calculate(newModel);
-      nextcommands._commands.forEach((cmd) => cmd(this.post));
     });
 
     commands._commands.forEach((cmd) => cmd(this.post));

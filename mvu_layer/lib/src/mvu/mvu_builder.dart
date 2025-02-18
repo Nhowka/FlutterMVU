@@ -142,7 +142,7 @@ class _MVUBuilderState<Model, Msg> extends State<MVUBuilder<Model, Msg>>
   late Model _latestModel;
 
   _MVUBuilderState(this._processor) {
-    _latestModel = _processor.useModel((model, dispatch) => model);
+    _latestModel = _processor.useModelSync((model, dispatch) => model);
     _changesSub = _processor.subscribe((model, dispatch) {
       if (mounted)
         setState(() {

@@ -185,6 +185,11 @@ abstract class MVUProcessor<Model, Msg> {
     _processor.post(msg);
   }
 
+  /// Stop listening for new messages and cancel all active subscriptions
+  void dispose() {
+    _processor.dispose();
+  }
+
   /// Use the model, after all current messages are processed, and dispatch function.
   /// Can be used to return values and dispatch new messages depending on the current model.
   Future<T> useModel<T>(
@@ -310,11 +315,12 @@ class _SubscriptionController<Model, Msg> {
     final oldKeys = _activeSubs.map((e) => e.$1.join('.')).toSet();
 
     _activeSubs.removeWhere((element) {
-      final key = element.$1.join('.');
+      final (keyList, disposer) = element;
+      final key = keyList.join('.');
       if (newKeys.contains(key)) {
         return false;
       } else {
-        element.$2();
+        disposer();
         return true;
       }
     });
@@ -323,6 +329,14 @@ class _SubscriptionController<Model, Msg> {
         _activeSubs.add((id, subscribe(_dispatch)));
       }
     }
+  }
+
+  void cancel() {
+    _activeSubs.removeWhere((element) {
+      final (keyList, disposer) = element;
+      disposer();
+      return true;
+    });
   }
 }
 
@@ -413,5 +427,6 @@ class _MVUProcessor<Model, Msg> {
     _appLoopSub.cancel();
     changes.close();
     _mainLoop.close();
+    _subscriptionController.cancel();
   }
 }

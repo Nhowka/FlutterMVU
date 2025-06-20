@@ -1,3 +1,12 @@
+# 0.3.7
+
+- Added a new boolean field `disposesProcessor` to MVU widgets and providers. This flag controls whether the associated `MVUProcessor` should be automatically disposed when the widget is removed from the widget tree.
+- For widgets that receive an external processor (e.g., via `MVUBuilder.ofProcessor` or `MVUProvider.fromProcessor`), the default is `false` to avoid disposing shared or reused processors.  
+- For widgets that create their own processor by encapsulating their `init` and `update` functions, the default is `true`, meaning the processor will be disposed when the widget is removed from the tree.
+- Fixed a resource leak where active subscriptions were not disposed if the widget was removed from the widget tree. Previously, if a widget was removed, its subscriptions could remain active because their disposers were not called. This only happened when the widget was removed, not when the model changed and the subscription was no longer returned. With the new `disposesProcessor` field, setting it to `true` ensures that all subscriptions and resources are properly cleaned up when the widget is disposed.
+- Added a new `MVUProcessor.dispose` method to allow manual disposal of the processor and its resources. This is useful for scenarios where you want to clean up resources without relying on the widget lifecycle.
+- Breaking change: The `dispose` method on `MVUWidget` and similar widgets has updated to have their `MVUProcessor` as an argument. This way you can access the processor and call its `dispose` method if needed or call the `dispatch` with new messages to disable active subscriptions or reflect the disposal in the possibly shared model. This should be used with care, for most cases we recommend using the subscription system to handle long-running tasks or external events, as it provides a cleaner and more controlled way to manage resources.
+
 # 0.3.6
 
 - Breaking change: The method `useModel` from `MVUProcessor` was renamed to `useModelSync`. Now `useModel` is a new method that returns a `Future` using the model. This method leverages the MVU loop to guarantee that the model is up to date when the future completes. The `useModelSync` method is still available for synchronous access to the model, but it's not recommended to use it on flows that dispatches messages that might update the model.

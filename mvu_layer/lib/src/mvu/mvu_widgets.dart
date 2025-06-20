@@ -27,6 +27,7 @@ class MVUProvider<Model, Msg> extends StatefulWidget {
       this.child = const SizedBox.shrink(),
       this.onInit,
       this.onDispose,
+      this.disposesProcessor = true,
       super.key})
       : processor = MVUProcessor.fromFunctions(
             init: init,
@@ -44,6 +45,7 @@ class MVUProvider<Model, Msg> extends StatefulWidget {
       this.child = const SizedBox.shrink(),
       this.onInit,
       this.onDispose,
+      this.disposesProcessor = false,
       super.key});
 
   MVUProvider<Model, Msg> _copyWith({required Widget child}) =>
@@ -52,6 +54,8 @@ class MVUProvider<Model, Msg> extends StatefulWidget {
         child: child,
         onInit: onInit,
         key: key,
+        onDispose: onDispose,
+        disposesProcessor: disposesProcessor,
       );
 
   /// Recover the processor from the context.
@@ -63,6 +67,7 @@ class MVUProvider<Model, Msg> extends StatefulWidget {
           ?.processor;
 
   final MVUProcessor<Model, Msg> processor;
+  final bool disposesProcessor;
   final Widget child;
   final Effect<Msg>? onInit;
   final Effect<Msg>? onDispose;
@@ -82,6 +87,9 @@ class _MVUProviderDisposer<Model, Msg> extends State<MVUProvider<Model, Msg>> {
   @override
   void dispose() {
     widget.onDispose?.call(widget.processor.dispatch);
+    if (widget.disposesProcessor) {
+      widget.processor.dispose();
+    }
     super.dispose();
   }
 
@@ -165,7 +173,9 @@ abstract class MVUWidget<Model, Msg> extends Widget {
 
   Subs<Msg> subscriptions(Model model) => [];
 
-  void dispose() {}
+  bool get disposesProcessor => true;
+
+  void dispose(MVUProcessor<Model, Msg> processor) {}
 
   bool modelEquality(Model previousModel, Model nextModel) =>
       identical(previousModel, nextModel);
@@ -187,7 +197,9 @@ abstract class MVUWidgetWithTicker<Model, Msg> extends Widget {
 
   Subs<Msg> subscriptions(Model model) => [];
 
-  void dispose() {}
+  bool get disposesProcessor => true;
+
+  void dispose(MVUProcessor<Model, Msg> processor) {}
 
   bool modelEquality(Model previousModel, Model nextModel) =>
       identical(previousModel, nextModel);
@@ -205,7 +217,8 @@ class _MVUWidgetElement<Model, Msg> extends ComponentElement {
         view: builder.build,
         subscriptions: builder.subscriptions,
         modelEquality: builder.modelEquality,
-        onDispose: builder.dispose);
+        onDispose: builder.dispose,
+        disposesProcessor: builder.disposesProcessor);
   }
 }
 
@@ -221,7 +234,8 @@ class _MVUWidgetElementWithTicker<Model, Msg> extends ComponentElement {
         view: builder.build,
         subscriptions: builder.subscriptions,
         modelEquality: builder.modelEquality,
-        onDispose: builder.dispose);
+        onDispose: builder.dispose,
+        disposesProcessor: builder.disposesProcessor);
   }
 }
 
@@ -238,7 +252,8 @@ class _MVUWidgetElementProvider<Model, Msg> extends ComponentElement {
         modelEquality: builder.modelEquality,
         child: builder.child,
         onInit: builder.onInit,
-        onDispose: builder.onDispose);
+        onDispose: builder.onDispose,
+        disposesProcessor: builder.disposesProcessor);
   }
 }
 
@@ -247,6 +262,7 @@ abstract class MVUProviderWidget<Model, Msg> extends Widget {
   final Widget child;
   final Effect<Msg>? onInit;
   final Effect<Msg>? onDispose;
+  bool get disposesProcessor => true;
 
   (Model, Cmd<Msg>) update(Msg msg, Model model);
 

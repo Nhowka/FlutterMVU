@@ -17,31 +17,39 @@ typedef MsgWidgetBuilderWithTickerProvider<Model, Msg> = Widget Function(
 class MVUBuilder<Model, Msg> extends StatefulWidget {
   final MsgWidgetBuilderWithTickerProvider<Model, Msg> _view;
   final MVUProcessor<Model, Msg> _processor;
-  final void Function() _onDispose;
+  final void Function(MVUProcessor<Model, Msg> processor) _onDispose;
+  final bool _disposesProcessor;
 
-  MVUBuilder._(this._processor, this._view, {void Function()? onDispose})
-      : this._onDispose = onDispose ?? (() {});
+  MVUBuilder._(this._processor, this._view,
+      {void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+      required bool disposesProcessor})
+      : _disposesProcessor = disposesProcessor,
+        this._onDispose = onDispose ?? ((_) {});
 
   /// Creates a [MVUBuilder] with the given [processor] and [view] functions.
   /// Optional [onDispose] will run when the widget is removed from the widget tree.
   MVUBuilder.ofProcessor(
       {required MVUProcessor<Model, Msg> processor,
       required MsgWidgetBuilder<Model, Msg> view,
-      void Function()? onDispose})
+      void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+      bool disposesProcessor = false})
       : this._(
             processor,
             ((BuildContext context, TickerProvider _, Model model,
                     Dispatch<Msg> dispatcher) =>
                 view(context, model, dispatcher)),
-            onDispose: onDispose);
+            onDispose: onDispose,
+            disposesProcessor: disposesProcessor);
 
   /// Creates a [MVUBuilder] with the given [processor] and [view] functions for views that need a [TickerProvider].
   /// Optional [onDispose] will run when the widget is removed from the widget tree.
   MVUBuilder.ofProcessorAndTickerProvider(
       {required MVUProcessor<Model, Msg> processor,
       required MsgWidgetBuilderWithTickerProvider<Model, Msg> view,
-      void Function()? onDispose})
-      : this._(processor, view, onDispose: onDispose);
+      void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+      bool disposesProcessor = false})
+      : this._(processor, view,
+            onDispose: onDispose, disposesProcessor: disposesProcessor);
 
   /// Creates a [MVUBuilder] with the given [init], [update] and [view] functions.
   ///   * [init] is called once to return the initial model and commands.
@@ -53,7 +61,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
       required MsgWidgetBuilder<Model, Msg> view,
       Subscription<Model, Msg>? subscriptions,
       bool Function(Model, Model)? modelEquality,
-      void Function()? onDispose})
+      void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+      bool disposesProcessor = true})
       : this._(
             MVUProcessor.fromFunctions(
                 init: init,
@@ -63,7 +72,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
             ((BuildContext context, TickerProvider _, Model model,
                     Dispatch<Msg> dispatcher) =>
                 view(context, model, dispatcher)),
-            onDispose: onDispose);
+            onDispose: onDispose,
+            disposesProcessor: disposesProcessor);
 
   /// Creates a [MVUBuilder] with the given [init], [update] and [view] functions.
   ///  * [init] is called once to return the initial model and commands.
@@ -76,7 +86,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
       required MsgWidgetBuilderWithTickerProvider<Model, Msg> view,
       Subscription<Model, Msg>? subscriptions,
       bool Function(Model, Model)? modelEquality,
-      void Function()? onDispose})
+      void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+      bool disposesProcessor = true})
       : this._(
             MVUProcessor.fromFunctions(
                 init: init,
@@ -84,7 +95,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
                 subscriptions: subscriptions,
                 modelEquality: modelEquality),
             view,
-            onDispose: onDispose);
+            onDispose: onDispose,
+            disposesProcessor: disposesProcessor);
 
   /// Creates a [MVUBuilder] with the given [init], [update] and [view] functions.
   /// * [init] is called once with the given [argument] to return the initial model and commands.
@@ -97,7 +109,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
           required MsgWidgetBuilderWithTickerProvider<Model, Msg> view,
           Subscription<Model, Msg>? subscriptions,
           bool Function(Model, Model)? modelEquality,
-          void Function()? onDispose}) =>
+          void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+          bool disposesProcessor = true}) =>
       MVUBuilder._(
           MVUProcessor.fromFunctions(
               init: () => init(a),
@@ -105,7 +118,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
               subscriptions: subscriptions,
               modelEquality: modelEquality),
           view,
-          onDispose: onDispose);
+          onDispose: onDispose,
+          disposesProcessor: disposesProcessor);
 
   /// Creates a [MVUBuilder] with the given [init], [update] and [view] functions.
   /// * [init] is called once with the given [argument] to return the initial model and commands.
@@ -117,7 +131,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
           required MsgWidgetBuilder<Model, Msg> view,
           Subscription<Model, Msg>? subscriptions,
           bool Function(Model, Model)? modelEquality,
-          void Function()? onDispose}) =>
+          void Function(MVUProcessor<Model, Msg> processor)? onDispose,
+          bool disposesProcessor = true}) =>
       MVUBuilder._(
           MVUProcessor.fromFunctions(
               init: () => init(a),
@@ -127,7 +142,8 @@ class MVUBuilder<Model, Msg> extends StatefulWidget {
           (BuildContext context, TickerProvider _, Model model,
                   Dispatch<Msg> dispatcher) =>
               view(context, model, dispatcher),
-          onDispose: onDispose);
+          onDispose: onDispose,
+          disposesProcessor: disposesProcessor);
 
   @override
   State<MVUBuilder<Model, Msg>> createState() => _MVUBuilderState(_processor);
@@ -159,7 +175,10 @@ class _MVUBuilderState<Model, Msg> extends State<MVUBuilder<Model, Msg>>
   @override
   void dispose() {
     _changesSub.cancel();
-    widget._onDispose();
+    widget._onDispose(_processor);
+    if (widget._disposesProcessor) {
+      _processor.dispose();
+    }
     super.dispose();
   }
 }

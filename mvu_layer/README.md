@@ -192,6 +192,73 @@ class CounterProvider extends MVUProviderWidget<CounterState, CounterMsgType> {
 }
 ```
 
+# Since 0.4.0
+
+## Breaking changes and migration
+
+### Subscriptions — `SubHandler` replaces bare `Dispatch`
+
+The subscription setup function now receives a `SubHandler<Model, Msg>` instead of a bare `Dispatch<Msg>`. In most cases **no code changes are needed**: calling `handler(msg)` works exactly like the old `dispatch(msg)` did, because `SubHandler` implements `call`.
+
+```dart
+// 0.3.x — still compiles unchanged
+(dispatch) {
+  return Timer.periodic(duration, (_) => dispatch(const Tick())).cancel;
+}
+
+// 0.4.x — same behaviour, new name makes intent clearer
+(handler) {
+  return Timer.periodic(duration, (_) => handler(const Tick())).cancel;
+}
+```
+
+The reason for the change is that the old API had a silent bug: any reference to `model` captured from the outer `subscriptions(model)` call would become stale once the subscription was registered, because the setup function only runs once per subscription ID. The `SubHandler` fixes this by exposing `handler.model`, which always returns the current model:
+
+```dart
+// BUG in 0.3.x — model.threshold is frozen at registration time
+(dispatch) {
+  return stream.listen((value) {
+    if (value > model.threshold) dispatch(const ThresholdExceeded());
+  }).cancel;
+}
+
+// FIXED in 0.4.x — reads the live model on every event
+(handler) {
+  return stream.listen((value) {
+    if (value > handler.model.threshold) handler(const ThresholdExceeded());
+  }).cancel;
+}
+```
+
+The `Subs` type now also requires the model type parameter: `Subs<Model, Msg>` instead of `Subs<Msg>`.
+
+```dart
+// 0.3.x
+Subs<CounterMsgType> subscriptions(CounterState model) => [ ... ];
+
+// 0.4.x
+Subs<CounterState, CounterMsgType> subscriptions(CounterState model) => [ ... ];
+```
+
+### `Cmd.ofFunc` / `Cmd.ofArgFunc` — `onThrow` replaces `onException`/`onError`
+
+The two separate error callbacks have been merged into a single `onThrow(dynamic)` that catches all thrown objects:
+
+```dart
+// 0.3.x
+Cmd.ofFunc(fetchData,
+  onSuccess: DataLoaded.new,
+  onException: (e) => LoadFailed(e.toString()),
+  onError: (e) => LoadFailed(e.toString()),
+)
+
+// 0.4.x
+Cmd.ofFunc(fetchData,
+  onSuccess: DataLoaded.new,
+  onThrow: (e) => LoadFailed(e.toString()),
+)
+```
+
 # 0.2.0 legacy readme
 The following part is about the legacy 0.2.0 version of the library. It's still valid, and I'm keeping it here for historical reasons. The new version is much more Elmish and uses the Dart 3.0 features to make the knowledge transferable.
 

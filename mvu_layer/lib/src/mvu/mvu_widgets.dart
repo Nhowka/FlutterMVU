@@ -120,6 +120,7 @@ class MVUContext<Model, Msg> extends StatelessWidget {
       super.key})
       : _view = view;
 
+  @override
   Widget build(BuildContext context) {
     if (MVUProvider.of<Model, Msg>(context)
         case MVUProcessor<Model, Msg> processor) {
@@ -171,7 +172,7 @@ abstract class MVUWidget<Model, Msg> extends Widget {
 
   (Model, Cmd<Msg>) init();
 
-  Subs<Msg> subscriptions(Model model) => [];
+  Subs<Model, Msg> subscriptions(Model model) => [];
 
   bool get disposesProcessor => true;
 
@@ -195,7 +196,7 @@ abstract class MVUWidgetWithTicker<Model, Msg> extends Widget {
 
   (Model, Cmd<Msg>) init();
 
-  Subs<Msg> subscriptions(Model model) => [];
+  Subs<Model, Msg> subscriptions(Model model) => [];
 
   bool get disposesProcessor => true;
 
@@ -268,7 +269,7 @@ abstract class MVUProviderWidget<Model, Msg> extends Widget {
 
   (Model, Cmd<Msg>) init();
 
-  Subs<Msg> subscriptions(Model model) => [];
+  Subs<Model, Msg> subscriptions(Model model) => [];
 
   bool modelEquality(Model previousModel, Model nextModel) =>
       identical(previousModel, nextModel);

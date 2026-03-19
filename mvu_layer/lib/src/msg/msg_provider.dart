@@ -132,6 +132,7 @@ class MsgProvider<Connector extends Messenger<Model>, Model>
         child: child,
         dependsOn: dependsOn,
         onInit: onInit,
+        onDispose: onDispose,
         key: key,
       );
 

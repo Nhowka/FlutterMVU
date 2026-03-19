@@ -8,7 +8,7 @@ class CounterProvider extends MVUProviderWidget<CounterState, CounterMsgType> {
   const CounterProvider({super.key, required super.child});
 
   @override
-  Subs<CounterMsgType> subscriptions(CounterState model) => [
+  Subs<CounterState, CounterMsgType> subscriptions(CounterState model) => [
         if (model.timer)
           (
             ["timer-100"],

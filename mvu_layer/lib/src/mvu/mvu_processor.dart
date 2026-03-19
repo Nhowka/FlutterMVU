@@ -3,10 +3,74 @@ import 'dart:async';
 typedef Dispatch<Msg> = void Function(Msg msg);
 typedef Effect<Msg> = FutureOr<void> Function(Dispatch<Msg> dispatch);
 typedef SubscriptionId = List<String>;
-typedef Subscribe<Msg> = void Function() Function(Dispatch<Msg> dispatch);
-typedef SubItem<Msg> = (SubscriptionId, Subscribe<Msg>);
-typedef Subs<Msg> = List<SubItem<Msg>>;
-typedef Subscription<Model, Msg> = Subs<Msg> Function(Model model);
+
+/// Provides dispatch and model access within a subscription's setup function.
+///
+/// `handler(msg)` / `handler.dispatch(msg)` — send a message.
+/// `handler.model` — read the **current** model (always fresh, never stale).
+///
+/// ## Avoiding stale model captures
+///
+/// The `subscriptions(Model model)` function is called with the current model
+/// on every model change, but a subscription's setup function is only invoked
+/// **once** when its ID first appears. Any `model` value captured via closure
+/// from the outer call will be frozen at that instant and will not update.
+///
+/// **Wrong** — `model` is captured and goes stale:
+/// ```dart
+/// Subs<MyModel, MyMsg> subscriptions(MyModel model) => [
+///   (['my-sub'], (handler) {
+///     return stream.listen((_) => handler(DoThing(model.count))).cancel;
+///     //                                            ^^^^^^^^^^^
+///     //                                            stale after first registration
+///   }),
+/// ];
+/// ```
+///
+/// **Correct** — read `handler.model` at event time:
+/// ```dart
+/// Subs<MyModel, MyMsg> subscriptions(MyModel model) => [
+///   (['my-sub'], (handler) {
+///     return stream.listen((_) => handler(DoThing(handler.model.count))).cancel;
+///   }),
+/// ];
+/// ```
+///
+/// **Preferred** (Elm-style) — emit a plain message and let `update` access
+/// the model, which always receives the freshest state:
+/// ```dart
+/// Subs<MyModel, MyMsg> subscriptions(MyModel model) => [
+///   (['my-sub'], (handler) {
+///     return stream.listen((_) => handler(EventOccurred())).cancel;
+///   }),
+/// ];
+/// // Then in update:
+/// (MyModel, Cmd<MyMsg>) update(MyMsg msg, MyModel model) => switch (msg) {
+///   EventOccurred() => (model.copyWith(count: model.count + 1), Cmd.none()),
+///   // ...
+/// };
+/// ```
+class SubHandler<Model, Msg> {
+  final Dispatch<Msg> _dispatch;
+  final Model Function() _getModel;
+
+  const SubHandler(this._dispatch, this._getModel);
+
+  /// Dispatch a message. Can also be invoked directly as `handler(msg)`.
+  void call(Msg msg) => _dispatch(msg);
+
+  /// Dispatch a message.
+  void dispatch(Msg msg) => _dispatch(msg);
+
+  /// The current model — always reflects the latest state.
+  Model get model => _getModel();
+}
+
+typedef Subscribe<Model, Msg> = void Function() Function(
+    SubHandler<Model, Msg> handler);
+typedef SubItem<Model, Msg> = (SubscriptionId, Subscribe<Model, Msg>);
+typedef Subs<Model, Msg> = List<SubItem<Model, Msg>>;
+typedef Subscription<Model, Msg> = Subs<Model, Msg> Function(Model model);
 
 extension MappedDispatch<Msg> on Dispatch<Msg> {
   /// This helper function can be used when going from a parent view to a child view.
@@ -84,20 +148,14 @@ class Cmd<Msg> {
   ///   Function that returns a message when the function terminated successfully using the returned non-null result from the task.
   /// [onMissing]:
   ///   Message used when the function terminated successfully and returned a null value.
-  /// [onException]:
-  ///   Function that returns a message when the function raised an [Exception], using the exception as input.
-  /// [onError]:
-  ///   Function that returns a message when the function raised an [Error], using the error as input.
+  /// [onThrow]:
+  ///   Function that returns a message when the function throws anything — covers both [Exception] and [Error] subclasses as well as any other thrown object.
   static Cmd<Msg> ofFunc<Msg, Result>(FutureOr<Result?> Function() task,
           {Msg Function(Result)? onSuccess,
           Msg? onMissing,
-          Msg Function(Exception)? onException,
-          Msg Function(Error)? onError}) =>
+          Msg Function(dynamic)? onThrow}) =>
       ofArgFunc((_) => task(), (),
-          onMissing: onMissing,
-          onError: onError,
-          onException: onException,
-          onSuccess: onSuccess);
+          onMissing: onMissing, onThrow: onThrow, onSuccess: onSuccess);
 
   /// Call a function that after returning a result, can be used to create and dispatch
   /// a new message.
@@ -110,17 +168,13 @@ class Cmd<Msg> {
   ///   Function that returns a message when the function terminated successfully using the returned non-null result from the task.
   /// [onMissing]:
   ///   Message used when the function terminated successfully and returned a null value.
-  /// [onException]:
-  ///   Function that returns a message when the function raised an [Exception], using the exception as input.
-  /// [onError]:
-  ///   Function that returns a message when the function raised an [Error], using the error as input.
-
+  /// [onThrow]:
+  ///   Function that returns a message when the function throws anything — covers both [Exception] and [Error] subclasses as well as any other thrown object.
   static Cmd<Msg> ofArgFunc<Msg, Result, Arg>(
       FutureOr<Result?> Function(Arg) task, Arg arg,
       {Msg Function(Result)? onSuccess,
       Msg? onMissing,
-      Msg Function(Exception)? onException,
-      Msg Function(Error)? onError}) {
+      Msg Function(dynamic)? onThrow}) {
     void bind(Dispatch<Msg> dispatch) async {
       try {
         final result = await task(arg);
@@ -133,13 +187,9 @@ class Cmd<Msg> {
             dispatch(onMissing);
           }
         }
-      } on Exception catch (ex) {
-        if (onException != null) {
-          dispatch(onException(ex));
-        }
-      } on Error catch (err) {
-        if (onError != null) {
-          dispatch(onError(err));
+      } catch (e) {
+        if (onThrow != null) {
+          dispatch(onThrow(e));
         }
       }
     }
@@ -160,7 +210,7 @@ abstract class MVUProcessor<Model, Msg> {
   (Model, Cmd<Msg>) init();
 
   /// Creates a list of subscriptions using the model.
-  Subs<Msg> subscriptions(Model model) => [];
+  Subs<Model, Msg> subscriptions(Model model) => [];
 
   /// Defines the function to use to compare models to prevent unnecessary updates.
   bool modelEquality(Model previousModel, Model nextModel) =>
@@ -213,7 +263,7 @@ abstract class MVUProcessor<Model, Msg> {
 class _DelegatingMVUProcessor<Model, Msg> extends MVUProcessor<Model, Msg> {
   final (Model, Cmd<Msg>) Function() _init;
   final (Model, Cmd<Msg>) Function(Msg, Model) _update;
-  final Subs<Msg> Function(Model) _subscriptions;
+  final Subs<Model, Msg> Function(Model) _subscriptions;
   final bool Function(Model, Model) _modelEquality;
 
   _DelegatingMVUProcessor(
@@ -238,68 +288,99 @@ class _DelegatingMVUProcessor<Model, Msg> extends MVUProcessor<Model, Msg> {
       _modelEquality(previousModel, nextModel);
 
   @override
-  Subs<Msg> subscriptions(Model model) => _subscriptions(model);
+  Subs<Model, Msg> subscriptions(Model model) => _subscriptions(model);
 }
 
-class Sub<Msg> {
-  final Subs<Msg> _subs;
+class Sub<Model, Msg> {
+  final Subs<Model, Msg> _subs;
 
-  const Sub(Subs<Msg> subs) : _subs = subs;
+  const Sub(Subs<Model, Msg> subs) : _subs = subs;
 
   /// Empty subscription.
-  static Sub<Msg> none<Msg>() => const Sub([]);
+  static Sub<Model, Msg> none<Model, Msg>() => Sub<Model, Msg>([]);
 
   /// Concat a list of subscriptions into a single one.
-  static Sub<Msg> batch<Msg>(List<Sub<Msg>> subs) =>
+  static Sub<Model, Msg> batch<Model, Msg>(List<Sub<Model, Msg>> subs) =>
       Sub(subs.expand((element) => element._subs).toList());
 
-  /// Map a subscription from a message to a new subscription with another message.
-  static Sub<Msg> map<Inner, Msg>(
-          String idPrefix, Sub<Inner> sub, Msg Function(Inner) f) =>
+  /// Map a subscription from one message type to another, keeping the same model.
+  static Sub<Model, Msg> map<Model, Inner, Msg>(
+          String idPrefix, Sub<Model, Inner> sub, Msg Function(Inner) f) =>
       Sub(sub._subs.map((inner) {
         final (subId, subscribe) = inner;
         return (
           [idPrefix, ...subId],
-          (dispatch) => subscribe((innerDispatch) => dispatch(f(innerDispatch)))
+          (SubHandler<Model, Msg> handler) => subscribe(
+              SubHandler<Model, Inner>(
+                  (Inner innerMsg) => handler.dispatch(f(innerMsg)),
+                  () => handler.model))
         );
       }).toList());
 
+  /// Map a subscription from a child model/message pair to a parent model/message pair.
+  ///
+  /// Use this when composing nested MVU components where both the model and
+  /// message types differ between parent and child.
+  ///
+  /// [msgMapper] converts a child message to a parent message.
+  /// [modelMapper] extracts the child model from the current parent model,
+  /// so the child subscription always receives a fresh, correctly-scoped model.
+  static Sub<ParentModel, ParentMsg>
+      mapWithModel<ParentModel, ChildModel, ChildMsg, ParentMsg>(
+              String idPrefix,
+              Sub<ChildModel, ChildMsg> sub,
+              ParentMsg Function(ChildMsg) msgMapper,
+              ChildModel Function(ParentModel) modelMapper) =>
+          Sub(sub._subs.map((inner) {
+            final (subId, subscribe) = inner;
+            return (
+              [idPrefix, ...subId],
+              (SubHandler<ParentModel, ParentMsg> handler) => subscribe(
+                  SubHandler<ChildModel, ChildMsg>(
+                      (ChildMsg innerMsg) =>
+                          handler.dispatch(msgMapper(innerMsg)),
+                      () => modelMapper(handler.model)))
+            );
+          }).toList());
+
   /// Creates a subscription from a stream, transforming the stream objects to messages.
-  static SubItem<Msg> fromStream<Msg, S>(SubscriptionId id, Stream<S> stream,
-          Msg? Function(S) streamObjectToMsg) =>
+  static SubItem<Model, Msg> fromStream<Model, Msg, S>(SubscriptionId id,
+          Stream<S> stream, Msg? Function(S) streamObjectToMsg) =>
       (
         id,
-        (dispatch) => stream.listen((s) {
+        (handler) => stream.listen((s) {
               if (streamObjectToMsg(s) case Msg msg) {
-                dispatch(msg);
+                handler(msg);
               }
             }).cancel
       );
 
   /// Creates a subscription from a stream, using the stream objects as messages.
-  static SubItem<Msg> fromMsgStream<Msg>(
+  static SubItem<Model, Msg> fromMsgStream<Model, Msg>(
           SubscriptionId id, Stream<Msg?> stream) =>
-      fromStream<Msg, Msg?>(id, stream, (msg) => msg);
+      fromStream<Model, Msg, Msg?>(id, stream, (msg) => msg);
 
   /// Creates a subscription from a future, transforming the future object to a message.
-  static SubItem<Msg> fromFuture<Msg, S>(SubscriptionId id, Future<S> future,
-          Msg? Function(S) futureObjectToMsg) =>
-      fromStream(id, future.asStream(), futureObjectToMsg);
+  static SubItem<Model, Msg> fromFuture<Model, Msg, S>(SubscriptionId id,
+          Future<S> future, Msg? Function(S) futureObjectToMsg) =>
+      fromStream<Model, Msg, S>(id, future.asStream(), futureObjectToMsg);
 }
 
 class _SubscriptionController<Model, Msg> {
   final Dispatch<Msg> _dispatch;
   final Subscription<Model, Msg> _subscription;
   final List<(SubscriptionId, void Function())> _activeSubs = [];
+  Model? _latestModel;
 
   _SubscriptionController(this._dispatch, this._subscription);
 
   void calculate(Model nextModel) {
+    _latestModel = nextModel;
     final calculatedSubs = _subscription(nextModel);
-    final dupes = [];
+    final dupes = <String>[];
     final newKeys = <String>{};
 
-    final newSubs = [];
+    final newSubs = <SubItem<Model, Msg>>[];
     for (final (subId, subscribe) in calculatedSubs) {
       final key = subId.join('.');
       if (newKeys.contains(key)) {
@@ -326,7 +407,8 @@ class _SubscriptionController<Model, Msg> {
     });
     for (final (id, subscribe) in newSubs) {
       if (!oldKeys.contains(id.join('.'))) {
-        _activeSubs.add((id, subscribe(_dispatch)));
+        _activeSubs
+            .add((id, subscribe(SubHandler(_dispatch, () => _latestModel!))));
       }
     }
   }
@@ -405,13 +487,16 @@ class _MVUProcessor<Model, Msg> {
           final (nextModel, nextcommands) = update(msg, newModel);
 
           /// Publish the changes in the state if the model is considered changed.
-          if (!_modelEquality(newModel, nextModel)) {
+          final modelChanged = !_modelEquality(newModel, nextModel);
+          if (modelChanged) {
             changes.add(nextModel);
           }
           newModel = nextModel;
           _currentModel = newModel;
 
-          _subscriptionController.calculate(newModel);
+          if (modelChanged) {
+            _subscriptionController.calculate(newModel);
+          }
           nextcommands.consumeWith(post);
           break;
         case _MVUHandleModel(:final handler):

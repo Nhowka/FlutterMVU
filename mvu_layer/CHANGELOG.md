@@ -1,3 +1,12 @@
+# 0.4.0
+
+- Breaking change: The subscription handler parameter in `Subscribe<Model, Msg>` is now a `SubHandler<Model, Msg>` instead of a bare `Dispatch<Msg>`. Existing code that uses `(dispatch) { dispatch(someMsg); }` continues to work unchanged because `SubHandler` exposes a `call` method — `dispatch` is simply now a `SubHandler` invoked the same way. The key addition is `handler.model`, which always returns the **current** model and fixes a bug where model values captured via closure in the subscription setup function would become stale after the subscription was first registered.
+- Breaking change: The type parameters for `Subscribe`, `SubItem`, `Subs`, and the new `SubHandler` class now follow the `<Model, Msg>` order, consistent with all other types in the library (`MVUProcessor<Model, Msg>`, `Subscription<Model, Msg>`, etc.).
+- Added `Sub.mapWithModel` for composing subscriptions across nested MVU components where both the model and message types differ between parent and child. Accepts a `msgMapper` and a `modelMapper`, giving the child subscription a correctly-scoped, always-fresh slice of the parent model.
+- Breaking change: `Cmd.ofFunc` and `Cmd.ofArgFunc` replace the separate `onException` / `onError` parameters with a single `onThrow(dynamic)` callback. The previous split left a gap where thrown objects that were neither `Exception` nor `Error` subclasses would be silently swallowed. The new callback catches everything.
+- Fixed: subscriptions were recalculated on every message even when `modelEquality` determined the model had not changed. Subscription recalculation now correctly skips when the model is unchanged.
+- Fixed: `MsgProvider.copyWith` (used internally by `MsgProviderTree`) was dropping the `onDispose` callback, so providers nested inside a `MsgProviderTree` never had their dispose callback invoked.
+
 # 0.3.7
 
 - Added a new boolean field `disposesProcessor` to MVU widgets and providers. This flag controls whether the associated `MVUProcessor` should be automatically disposed when the widget is removed from the widget tree.
